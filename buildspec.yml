@@ -4,7 +4,7 @@ phases:
   install:
     # https://github.com/aws/aws-codebuild-docker-images/issues/490#issuecomment-976470059
     runtime-versions:
-      nodejs: 14
+      nodejs: 16
     commands:
       - n 16
   pre_build:
