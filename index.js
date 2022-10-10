@@ -5,8 +5,6 @@
  */
 require('dotenv').config();
 
-require('dotenv').config();
-
 var app = require('./app');
 var debug = require('debug')('ofl:server');
 var http = require('http');
@@ -16,7 +14,6 @@ var http = require('http');
  */
 
 var port = normalizePort(process.env.PORT || '3000');
-console.log(port);
 app.set('port', port);
 
 /**
