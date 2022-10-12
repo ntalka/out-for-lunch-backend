@@ -1,12 +1,23 @@
 var jwt = require('jsonwebtoken');
 const sendEmail = require("./sendEmail");
+const bcrypt = require('bcryptjs');
+
+var db = require("../../../util/database");
 require('dotenv').config;
 
 class AuthController {
     async auth(request, response, next) {
         try {
 
-            var token = jwt.sign(request.body.email, request.body.firstName);
+            
+            var token = jwt.sign(request.body.email, request.body.password);
+            var hashedPassword= bcrypt.hashSync(request.body.password);
+            db.query(`INSERT INTO users (email, password, auth_token) VALUES ('${request.body.email}','${hashedPassword}','${token}')`, function(err, result) {
+                console.log(err);
+                // connection.query(`INSERT INTO users (email,password,auth_token) VALUES (${request.body.email},${hashedPassword},${token})`)
+            });
+            
+
 
             var verificationLink = `${process.env.web_url}/verify/${token}`
 
