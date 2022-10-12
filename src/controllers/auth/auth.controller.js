@@ -44,6 +44,25 @@ class AuthController {
     }
 
 
+    async login(request, response, next) {
+        try {
+
+            var email = request.body.email;
+            var password = request.body.password;
+            /// check if user is verified
+            ///if yes login
+            ///else send verify email response
+
+
+        } catch (error) {
+            next(error)
+        }
+        return undefined
+        // response.sendFile(path.join(__dirname, 'index.html'));
+
+    }
+
+
     async verify(request, response, next) {
 
         try {
