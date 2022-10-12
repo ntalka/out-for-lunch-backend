@@ -36,6 +36,32 @@ class AuthController {
     }
 
 
+    async login(request, response, next) {
+        try {
+
+            var email = jwt.sign(request.body.email, request.body.firstName);
+            var password = request.body.password;
+
+
+            var verificationLink = `${process.env.web_url}/verify/${token}`
+
+            var message = 'Click on this link to verify your email: ' + `<a  href="${verificationLink}"> Click here </a>`
+            await sendEmail(request.body.email, "Verify Email", message);
+            return response.send({
+                status: 200,
+                message: "Email sent"
+            })
+        } catch (error) {
+            next(error)
+        }
+        return undefined
+        // response.sendFile(path.join(__dirname, 'index.html'));
+
+    }
+
+
+
+
     async verify(request, response, next) {
 
         try {
