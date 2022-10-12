@@ -49,21 +49,7 @@ class AuthController {
 
             var email = request.body.email;
             var password = request.body.password;
-            /// check if user is verified
-            ///if yes login
-            ///else send verify email response
-
-            // bcrypt.compare(password, hashedPassword, function(err, res){
-                
-            //     if(err){
-            //         console.log('err')
-            //     }
-            //     if(res){
-            //         console.log('match')
-            //     }else{
-            //         console.log('dont matchh')
-            //     }
-            // })
+ 
             db.query(`select password, verified from users where email = '${email}'`, function(err, result){
                 if(result && result.length > 0) {
                     if(!result[0].verified) {
@@ -97,59 +83,10 @@ class AuthController {
                 }
             })
 
-            // db.query(`select verified from users where verified = 1 and email = '${request.body.email}'`, function(err, result) {
-
-            // bcrypt.compare(password, hashedPassword, function(err, res){
-                
-            //     if(err){
-            //         console.log('err')
-            //     }
-            //     if(res){
-
-            //         if(result && result.length>0)    {
-                                    
-            //             return response.send({
-            //                 status: 200,
-            //                 message: "login done"
-            //             })
-            //             } 
-            //             else {
-                            
-            //             return response.send({
-            //                 status: 400,
-            //                 message: "email does not match"
-            //             })
-            //             }  
-
-            //         console.log('match')
-            //     }else{
-            //         return response.send({
-            //             status: 402,
-            //             message: "pass does not match"
-            //         })
-            //         console.log('dont matchh')
-            //     }
-            // })
-
-
-            //     if(result && result.length>0){
-            //         db.query(`select verified from users where email = '${request.body.email}'`, function(err, result){
-                                                                                    
-            //         })
-            //     }else{
-            //         return response.send({
-            //             status: 400,
-            //             message: "verify your email"
-            //         })}
-
-            // })
-
         } catch (error) {
             next(error)
         }
         return undefined
-        // response.sendFile(path.join(__dirname, 'index.html'));
-
     }
 
 
