@@ -10,9 +10,7 @@ router.get('/', function (req, res, next) {
 });
 
 router.post('/signup', AuthController.auth);
-router.post('/login', AuthController.auth);
-
-
+router.post('/login', AuthController.login);
 router.post(`/verify/:token`, AuthController.verify);
 
 

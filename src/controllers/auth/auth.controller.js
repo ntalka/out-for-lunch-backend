@@ -9,15 +9,12 @@ class AuthController {
     async auth(request, response, next) {
         try {
 
-            
             var token = jwt.sign(request.body.email, request.body.password);
-            var hashedPassword= bcrypt.hashSync(request.body.password);
-            db.query(`INSERT INTO users (email, password, auth_token) VALUES ('${request.body.email}','${hashedPassword}','${token}')`, function(err, result) {
+            var hashedPassword = bcrypt.hashSync(request.body.password);
+            db.query(`INSERT INTO users (email, password, auth_token) VALUES ('${request.body.email}','${hashedPassword}','${token}')`, function (err, result) {
                 console.log(err);
                 // connection.query(`INSERT INTO users (email,password,auth_token) VALUES (${request.body.email},${hashedPassword},${token})`)
             });
-            
-
 
             var verificationLink = `${process.env.web_url}/verify/${token}`
 
@@ -39,18 +36,13 @@ class AuthController {
     async login(request, response, next) {
         try {
 
-            var email = jwt.sign(request.body.email, request.body.firstName);
+            var email = request.body.email;
             var password = request.body.password;
+            /// check if user is verified
+            ///if yes login
+            ///else send verify email response
 
 
-            var verificationLink = `${process.env.web_url}/verify/${token}`
-
-            var message = 'Click on this link to verify your email: ' + `<a  href="${verificationLink}"> Click here </a>`
-            await sendEmail(request.body.email, "Verify Email", message);
-            return response.send({
-                status: 200,
-                message: "Email sent"
-            })
         } catch (error) {
             next(error)
         }
@@ -58,8 +50,6 @@ class AuthController {
         // response.sendFile(path.join(__dirname, 'index.html'));
 
     }
-
-
 
 
     async verify(request, response, next) {
