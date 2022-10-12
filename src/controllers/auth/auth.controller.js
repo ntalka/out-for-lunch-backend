@@ -53,6 +53,96 @@ class AuthController {
             ///if yes login
             ///else send verify email response
 
+            // bcrypt.compare(password, hashedPassword, function(err, res){
+                
+            //     if(err){
+            //         console.log('err')
+            //     }
+            //     if(res){
+            //         console.log('match')
+            //     }else{
+            //         console.log('dont matchh')
+            //     }
+            // })
+            db.query(`select password, verified from users where email = '${email}'`, function(err, result){
+                if(result && result.length > 0) {
+                    if(!result[0].verified) {
+                        return response.send({
+                            status: 400,
+                            message: "Email is not verified"
+                        })
+                    }
+
+                    let dbPassword = result[0].password
+                    dbPassword = dbPassword.replace(/^\$2y(.+)$/i, '$2a$1')
+                    if(bcrypt.compareSync(password, dbPassword)) {
+                        // log user in
+                        return response.send({
+                            status: 200,
+                            message: "login done"
+                        })
+                    } else {
+                        // password does not match
+                        return response.send({
+                            status: 400,
+                            message: "email or password does not match"
+                        })
+                    }
+                }else{
+                    return response.send({
+                        status: 400,
+                        message: "email or passord does not match"
+                    })
+
+                }
+            })
+
+            // db.query(`select verified from users where verified = 1 and email = '${request.body.email}'`, function(err, result) {
+
+            // bcrypt.compare(password, hashedPassword, function(err, res){
+                
+            //     if(err){
+            //         console.log('err')
+            //     }
+            //     if(res){
+
+            //         if(result && result.length>0)    {
+                                    
+            //             return response.send({
+            //                 status: 200,
+            //                 message: "login done"
+            //             })
+            //             } 
+            //             else {
+                            
+            //             return response.send({
+            //                 status: 400,
+            //                 message: "email does not match"
+            //             })
+            //             }  
+
+            //         console.log('match')
+            //     }else{
+            //         return response.send({
+            //             status: 402,
+            //             message: "pass does not match"
+            //         })
+            //         console.log('dont matchh')
+            //     }
+            // })
+
+
+            //     if(result && result.length>0){
+            //         db.query(`select verified from users where email = '${request.body.email}'`, function(err, result){
+                                                                                    
+            //         })
+            //     }else{
+            //         return response.send({
+            //             status: 400,
+            //             message: "verify your email"
+            //         })}
+
+            // })
 
         } catch (error) {
             next(error)
