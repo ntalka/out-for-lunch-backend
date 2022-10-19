@@ -6,6 +6,7 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+const sequelize= require('./util/database');
 
 var app = express();
 
@@ -38,4 +39,9 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
+// sequelize.sync().then(result => {
+//   console.log(result);
+// }).catch(err => {
+//   console.log(err);
+// });
 module.exports = app;
