@@ -10,21 +10,18 @@ password: process.env.db_password
 
 });*/
 
-
-require ("dotenv").config();
+require('dotenv').config();
 const Sequelize = require('sequelize');
-const sequelize = new Sequelize (process.env.db_database, process.env.db_user, process.env.db_password,{
-  dialect : 'mysql',
-  host: process.env.db_host,
-  port: process.env.db_port
-});
- 
-
-module.exports = sequelize;
-
-
-
-
+const sequelize = new Sequelize(
+  process.env.db_database,
+  process.env.db_user,
+  process.env.db_password,
+  {
+    dialect: 'mysql',
+    host: process.env.db_host,
+    port: process.env.db_port,
+  }
+);
 
 /*db_con.connect((err) => {
   if (err) {
@@ -69,4 +66,5 @@ module.exports = sequelize;
   }
 });*/
 
-//module.exports = db_con;
+// module.exports = db_con;
+module.exports = sequelize;
