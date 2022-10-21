@@ -10,46 +10,43 @@ const { User } = Models;
 class AuthController {
   async auth(request, response, next) {
     try {
-      ///check if email already exists
+      const { email, password } = request.body;
       await User.findOne({
         where: {
-          email: request.body.email,
+          email,
         },
-      }).then((user) => {
-        console.log(user);
+      }).then(async (user) => {
+        ///check if email already exists
+        if (!user) {
+          var token = jwt.sign(email, password);
+          var hashedPassword = bcrypt.hashSync(password);
+          const name = email.split('@')[0];
+          const firstName = name.split('.')[0];
+          const lastName = name.split('.')[1];
+          User.create({
+            email,
+            password: hashedPassword,
+            authToken: token,
+            name: `${firstName} ${lastName}`,
+            officeId: 1,
+          });
+
+          var verificationLink = `${process.env.web_url}/verify/${token}`;
+
+          var message =
+            'Click on this link to verify your email: ' +
+            `<a  href="${verificationLink}"> Click here </a>`;
+          await sendEmail(request.body.email, 'Verify Email', message);
+          return response.status(200).send({
+            message: 'Email sent',
+            authToken: token,
+          });
+        } else {
+          return response.status(400).send({
+            message: 'Email already exists',
+          });
+        }
       });
-
-      // db.query(
-      //   `select email from users where email ='${request.body.email}'`,
-      //   async function (err, result) {
-      //     if (result.length > 0) {
-      //       return response.send({
-      //         status: 201,
-      //         message: 'Email already exists',
-      //       });
-      //     } else {
-      //       var token = jwt.sign(request.body.email, request.body.password);
-      //       var hashedPassword = bcrypt.hashSync(request.body.password);
-      //       db.query(
-      //         `INSERT INTO users (email, password, auth_token) VALUES ('${request.body.email}','${hashedPassword}','${token}')`,
-      //         function (err, result) {
-      //           console.log(err);
-      //         }
-      //       );
-
-      //       var verificationLink = `${process.env.web_url}/verify/${token}`;
-
-      //       var message =
-      //         'Click on this link to verify your email: ' +
-      //         `<a  href="${verificationLink}"> Click here </a>`;
-      //       await sendEmail(request.body.email, 'Verify Email', message);
-      //       return response.send({
-      //         status: 200,
-      //         message: 'Email sent',
-      //       });
-      //     }
-      //   }
-      // );
     } catch (error) {
       next(error);
     }
