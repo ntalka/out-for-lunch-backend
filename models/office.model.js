@@ -1,5 +1,6 @@
-import Sequelize, { Model } from 'sequelize';
-import Database from '../util/database';
+const Sequelize = require('sequelize');
+const { Model } = Sequelize;
+const Database = require('../config/config');
 class Office extends Model {}
 Office.init(
   {
@@ -27,6 +28,10 @@ Office.init(
       type: Sequelize.DATE,
       field: 'updated_at',
     },
+    deletedAt: {
+      type: Sequelize.DATE,
+      field: 'deleted_at',
+    },
   },
   {
     sequelize: Database,
@@ -38,4 +43,4 @@ Office.init(
   }
 );
 
-export { Office };
+module.exports = Office;

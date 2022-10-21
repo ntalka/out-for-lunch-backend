@@ -1,5 +1,6 @@
-import Sequelize, { Model } from 'sequelize';
-import Database from '../util/database';
+const Sequelize = require('sequelize');
+const { Model } = Sequelize;
+const Database = require('../config/config');
 class Group extends Model {}
 Group.init(
   {
@@ -33,6 +34,10 @@ Group.init(
       type: Sequelize.DATE,
       field: 'updated_at',
     },
+    deletedAt: {
+      type: Sequelize.DATE,
+      field: 'deleted_at',
+    },
   },
   {
     sequelize: Database,
@@ -56,4 +61,4 @@ Group.associate = ({ Office, Restaurant }) => {
   });
 };
 
-export { Group };
+module.exports = Group;

@@ -1,5 +1,6 @@
-import Sequelize, { Model } from 'sequelize';
-import Database from '../util/database';
+const Sequelize = require('sequelize');
+const { Model } = Sequelize;
+const Database = require('../config/config');
 class Restaurant extends Model {}
 Restaurant.init(
   {
@@ -26,6 +27,10 @@ Restaurant.init(
       type: Sequelize.DATE,
       field: 'updated_at',
     },
+    deletedAt: {
+      type: Sequelize.DATE,
+      field: 'deleted_at',
+    },
   },
   {
     sequelize: Database,
@@ -37,4 +42,4 @@ Restaurant.init(
   }
 );
 
-export { Restaurant };
+module.exports = Restaurant;

@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const Database = require('../util/database');
+const Database = require('../config/config');
 const { Model } = Sequelize;
 class User extends Model {}
 User.init(
@@ -48,6 +48,10 @@ User.init(
       type: Sequelize.DATE,
       field: 'updated_at',
     },
+    deletedAt: {
+      type: Sequelize.DATE,
+      field: 'deleted_at',
+    },
   },
   {
     sequelize: Database,
@@ -66,4 +70,4 @@ User.associate = ({ Office }) => {
   });
 };
 
-module.exports = { User };
+module.exports = User;

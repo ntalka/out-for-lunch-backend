@@ -4,44 +4,52 @@ const bcrypt = require('bcryptjs');
 var db = require('../../../config/config');
 require('dotenv').config;
 
+const Models = require('../../../models');
+const { User } = Models;
+
 class AuthController {
   async auth(request, response, next) {
     try {
       ///check if email already exists
-      ///check if email already exists
-      ///check if email already exists
+      await User.findOne({
+        where: {
+          email: request.body.email,
+        },
+      }).then((user) => {
+        console.log(user);
+      });
 
-      db.query(
-        `select email from users where email ='${request.body.email}'`,
-        async function (err, result) {
-          if (result.length > 0) {
-            return response.send({
-              status: 201,
-              message: 'Email already exists',
-            });
-          } else {
-            var token = jwt.sign(request.body.email, request.body.password);
-            var hashedPassword = bcrypt.hashSync(request.body.password);
-            db.query(
-              `INSERT INTO users (email, password, auth_token) VALUES ('${request.body.email}','${hashedPassword}','${token}')`,
-              function (err, result) {
-                console.log(err);
-              }
-            );
+      // db.query(
+      //   `select email from users where email ='${request.body.email}'`,
+      //   async function (err, result) {
+      //     if (result.length > 0) {
+      //       return response.send({
+      //         status: 201,
+      //         message: 'Email already exists',
+      //       });
+      //     } else {
+      //       var token = jwt.sign(request.body.email, request.body.password);
+      //       var hashedPassword = bcrypt.hashSync(request.body.password);
+      //       db.query(
+      //         `INSERT INTO users (email, password, auth_token) VALUES ('${request.body.email}','${hashedPassword}','${token}')`,
+      //         function (err, result) {
+      //           console.log(err);
+      //         }
+      //       );
 
-            var verificationLink = `${process.env.web_url}/verify/${token}`;
+      //       var verificationLink = `${process.env.web_url}/verify/${token}`;
 
-            var message =
-              'Click on this link to verify your email: ' +
-              `<a  href="${verificationLink}"> Click here </a>`;
-            await sendEmail(request.body.email, 'Verify Email', message);
-            return response.send({
-              status: 200,
-              message: 'Email sent',
-            });
-          }
-        }
-      );
+      //       var message =
+      //         'Click on this link to verify your email: ' +
+      //         `<a  href="${verificationLink}"> Click here </a>`;
+      //       await sendEmail(request.body.email, 'Verify Email', message);
+      //       return response.send({
+      //         status: 200,
+      //         message: 'Email sent',
+      //       });
+      //     }
+      //   }
+      // );
     } catch (error) {
       next(error);
     }
