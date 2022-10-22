@@ -3,7 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./index.js"
+    "start": "nodemon ./src/index.js",
+    "migrate": "npx sequelize-cli --options-path ./.sequelize db:migrate",
+    "undo-migrate": "npx sequelize-cli --options-path ./.sequelize db:migrate:undo",
+    "migration": "npx sequelize-cli migration:generate --options-path=.sequelize --name"
   },
   "engines": {
     "node": "16"
@@ -22,6 +25,12 @@
     "mysql2": "^2.3.3",
     "node-fetch": "^3.2.10",
     "nodemailer": "^6.8.0",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "sequelize": "^6.25.3",
+    "url": "^0.11.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20",
+    "sequelize-cli": "^6.5.1"
   }
 }
