@@ -6,7 +6,7 @@ const { Op, QueryTypes } = sequelize;
 const { Group, GroupMember, User, Restaurant } = Models;
 
 class GroupController {
-  createGroup(request, response, next) {
+  createCustomGroup(request, response, next) {
     try {
       Group.create({
         time: new moment(request.body.time),
@@ -67,7 +67,7 @@ class GroupController {
     return undefined;
   }
 
-  async getGroupList(request, response, next) {
+  async getGroupsList(request, response, next) {
     await User.findOne({
       attributes: ['id', 'officeId', 'authToken'],
       where: {
@@ -121,6 +121,38 @@ class GroupController {
         console.log(error);
       });
   }
+
+  async joinGroup(request, response, next) {
+    try {
+      await User.findOne({
+        attributes: ['id'],
+        where: {
+          authToken: request.body.authToken,
+        },
+      }).then(async (user) => {
+        if (user) {
+          GroupMember.create({
+            userId: user.id,
+            groupId: request.body.groupId,
+          });
+
+          response.send({
+            status: 200,
+            message: 'Group member is added',
+          });
+        } else {
+          response.send({
+            status: 400,
+            message: 'No user found',
+          });
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
+    return undefined;
+  }
+
   async joinRandomGroup(request, response, next) {
     try {
       let { userId, officeId } = await User.findOne({
@@ -139,7 +171,6 @@ class GroupController {
         });
 
       const groupIds = await Group.findAll({
-        // attributes: ['id', 'officeId', 'restaurantId'],
         attributes: ['id'],
         where: {
           officeId: officeId,
@@ -161,16 +192,10 @@ class GroupController {
         });
       }
 
-      let min = 0;
-      let max = groupIds.length;
-
       let random = 1;
       while (random >= 0) {
-        random = Math.floor(Math.random() * (max - min) + min);
-        console.log(groupIds);
-        console.log(random);
+        random = Math.floor(Math.random() * groupIds.length);
         let groupId = groupIds[random];
-        console.log('group id: ', groupId);
         const groupMember = await GroupMember.findOne({
           attributes: ['userId'],
           where: {
@@ -178,30 +203,34 @@ class GroupController {
             groupId: groupId,
           },
         });
-        console.log(groupMember.userId);
-        if (!!groupMember && groupMember.userId) {
-        } else {
-          console.log('in no result');
+        random = -1;
+        if (!groupMember) {
           await GroupMember.create({
             userId: userId,
             groupId: groupId,
           })
             .then(() => {
-              console.log('member created');
               random = -1;
-              return;
+              response.send({
+                status: 200,
+                message: 'Group joined successfully',
+              });
             })
             .catch((error) => {
               console.log(error);
+              response.status(400).send({
+                message: 'Group could not be joined',
+              });
+              random = -1;
             });
+        } else if (groupIds.length === 1) {
+          response.send({
+            status: 200,
+            message: 'Group already joined',
+          });
           random = -1;
         }
       }
-
-      response.send({
-        status: 200,
-        message: 'success. user joined the group',
-      });
     } catch (error) {
       next(error);
     }
