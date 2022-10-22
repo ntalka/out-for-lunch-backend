@@ -24,5 +24,4 @@ router.post('/joinGroup', GroupController.joinGroup);
 router.post('/joinRandomGroup', GroupController.joinRandomGroup);
 router.post('/getGroupList', GroupController.getGroupList);
 
-
 module.exports = router;
