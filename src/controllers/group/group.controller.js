@@ -6,35 +6,40 @@ const { Op, QueryTypes } = sequelize;
 const { Group, GroupMember, User, Restaurant } = Models;
 
 class GroupController {
-  createCustomGroup(request, response, next) {
+  async createCustomGroup(request, response, next) {
     try {
-      Group.create({
+      let { userId, officeId } = await User.findOne({
+        attributes: ['id', 'officeId'],
+        where: {
+          authToken: request.body.authToken,
+        },
+      })
+        .then(async (user) => {
+          if (user) {
+            return { userId: user.id, officeId: user.officeId };
+          } else return null;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      await Group.create({
         time: new moment(request.body.time),
-        officeId: request.body.officeId,
+        officeId: officeId,
         restaurantId: request.body.restaurantId,
       }).then(async (group) => {
         if (group) {
-          await User.findOne({
-            attributes: ['id'],
-            where: {
-              authToken: request.body.authToken,
-            },
-          }).then(async (user) => {
-            if (user) {
-              GroupMember.create({
-                userId: user.id,
-                groupId: group.id,
-              });
-              response.send({
-                status: 200,
-                message: 'Success',
-              });
-            } else {
-              console.log('not creating group members');
-            }
+          await GroupMember.create({
+            userId,
+            groupId: group.id,
+          });
+          response.send({
+            status: 200,
+            message: 'Success',
           });
         } else {
-          console.log('not');
+          response.status(400).send({
+            message: 'Group not created',
+          });
         }
       });
     } catch (error) {
@@ -45,8 +50,23 @@ class GroupController {
 
   async createRandomGroup(request, response, next) {
     try {
+      let { userId, officeId } = await User.findOne({
+        attributes: ['id', 'officeId'],
+        where: {
+          authToken: request.body.authToken,
+        },
+      })
+        .then(async (user) => {
+          if (user) {
+            return { userId: user.id, officeId: user.officeId };
+          } else return null;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+
       const nearByRestaurants = await Sequelize.query(
-        `SELECT id FROM restaurants WHERE JSON_CONTAINS(nearby_office, \'[${request.body.nearByOffice}]\')`,
+        `SELECT id FROM restaurants WHERE JSON_CONTAINS(nearby_office, \'[${officeId}]\')`,
         {
           type: QueryTypes.SELECT,
         }
@@ -56,11 +76,62 @@ class GroupController {
         } else return [];
       });
 
-      response.send({
-        status: 200,
-        message: 'Success',
-        data: nearByRestaurants,
-      });
+      if (!nearByRestaurants.length) {
+        response.status(400).send({
+          message: 'No restaurant found',
+        });
+      }
+
+      let random = 1;
+      while (random >= 0) {
+        random = Math.floor(Math.random() * nearByRestaurants.length);
+        let restaurantId = nearByRestaurants[random];
+        const group = await Group.findOne({
+          attributes: ['id'],
+          where: {
+            restaurantId,
+            officeId,
+          },
+        });
+        random = -1;
+        if (!group) {
+          await Group.create({
+            restaurantId,
+            officeId,
+            time: new moment(request.body.time),
+          })
+            .then(async (group) => {
+              if (group) {
+                await GroupMember.create({
+                  userId,
+                  groupId: group.id,
+                });
+              } else {
+                response.status(400).send({
+                  message: 'Group not joined',
+                });
+              }
+              random = -1;
+              response.send({
+                status: 200,
+                message: 'Group created successfully',
+              });
+            })
+            .catch((error) => {
+              console.log(error);
+              response.status(400).send({
+                message: 'Group could not be created',
+              });
+              random = -1;
+            });
+        } else if (nearByRestaurants.length === 1) {
+          response.send({
+            status: 200,
+            message: 'No new restaurant to create new group',
+          });
+          random = -1;
+        }
+      }
     } catch (error) {
       next(error);
     }
@@ -68,58 +139,63 @@ class GroupController {
   }
 
   async getGroupsList(request, response, next) {
-    await User.findOne({
-      attributes: ['id', 'officeId', 'authToken'],
-      where: {
-        authToken: request.body.authToken,
-      },
-    })
-      .then(async (user) => {
-        if (user) {
-          Group.findAll({
-            attributes: ['id', 'officeId', 'restaurantId'],
-            where: {
-              officeId: user.officeId,
-              time: {
-                [Op.gte]: new Date(),
-              },
-            },
-            include: [
-              {
-                model: GroupMember,
-                as: 'groupMember',
-                attributes: ['userId'],
-                include: [
-                  {
-                    model: User,
-                    as: 'user',
-                    attributes: ['name'],
-                  },
-                ],
-              },
-              {
-                model: Restaurant,
-                as: 'restaurant',
-                attributes: ['name'],
-              },
-            ],
-          }).then((result) => {
-            response.send({
-              status: 200,
-              message: 'Success',
-              data: result,
-            });
-          });
-        } else {
-          response.send({
-            status: 400,
-            message: 'Could not get user',
-          });
-        }
+    try {
+      await User.findOne({
+        attributes: ['id', 'officeId', 'authToken'],
+        where: {
+          authToken: request.body.authToken,
+        },
       })
-      .catch((error) => {
-        console.log(error);
-      });
+        .then(async (user) => {
+          if (user) {
+            Group.findAll({
+              attributes: ['id', 'officeId', 'restaurantId'],
+              where: {
+                officeId: user.officeId,
+                time: {
+                  [Op.gte]: new Date(),
+                },
+              },
+              include: [
+                {
+                  model: GroupMember,
+                  as: 'groupMember',
+                  attributes: ['userId'],
+                  include: [
+                    {
+                      model: User,
+                      as: 'user',
+                      attributes: ['name'],
+                    },
+                  ],
+                },
+                {
+                  model: Restaurant,
+                  as: 'restaurant',
+                  attributes: ['name'],
+                },
+              ],
+            }).then((result) => {
+              response.send({
+                status: 200,
+                message: 'Success',
+                data: result,
+              });
+            });
+          } else {
+            response.send({
+              status: 400,
+              message: 'Could not get user',
+            });
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } catch (error) {
+      next(error);
+    }
+    return undefined;
   }
 
   async joinGroup(request, response, next) {
