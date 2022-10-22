@@ -22,6 +22,6 @@ router.post(`/getRestaurantList`, RestaurantController.getRestaurantList);
 router.post('/createGroup', GroupController.createGroup);
 router.post('/joinGroup', GroupController.joinGroup);
 router.post('/joinRandomGroup', GroupController.joinRandomGroup);
-router.post('/getGroupList', GroupController.getGroupList);
+router.get('/getGroupList', GroupController.getGroupList);
 
 module.exports = router;
