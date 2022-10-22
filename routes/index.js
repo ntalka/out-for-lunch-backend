@@ -21,7 +21,7 @@ router.post(`/get-restaurant-list-api`, RestaurantController.getRestaurantListFr
 
 // router.post(`/get-restaurant-list-api`, RestaurantController.getRestaurantList);
 
-router.post('/createGroup', GroupController.createGroup);
+router.post('/createGroup', GroupController.createGroup); //custom group
 router.post('/createRandomGroup', GroupController.createRandomGroup);
 router.post('/joinGroup', GroupController.joinGroup);
 router.post('/joinRandomGroup', GroupController.joinRandomGroup);
