@@ -16,7 +16,7 @@ Restaurant.init({
     allowNull: false,
   },
 
-  nearbyOffice: {
+  nearByOffice: {
     field: 'nearby_office',
     type: Sequelize.JSON,
   },

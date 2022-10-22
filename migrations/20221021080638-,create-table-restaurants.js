@@ -21,7 +21,7 @@ module.exports = {
         allowNull: false,
       },
 
-      nearbyOffice: {
+      nearByOffice: {
         field: 'nearby_office',
         type: Sequelize.JSON,
       },
