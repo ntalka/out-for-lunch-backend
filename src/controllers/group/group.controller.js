@@ -54,6 +54,81 @@ class GroupController {
     }
 
 
+
+
+    createRandomGroup(request, response, next) {
+
+        try {
+
+            let restaurantList = [];
+
+
+            Restaurant.findAll({
+                attributes: ['id'],
+                where: {
+                    nearByOffice: {
+                        [Op.contains]: [request.body.nearByOffice]
+                    },
+                },
+            }).then(async (restaurant) => {
+
+                response.send({
+                    status: 200,
+                    message: "Success",
+                    data: restaurant,
+                })
+
+
+
+            }).catch(error => {
+                console.log(error);
+            })
+
+
+            ///////////////////////////////////////
+            // Group.create({
+            //     time: new moment(request.body.time),
+            //     officeId: request.body.officeId,
+            // }).then(async (group) => {
+            //     if (group) {
+            //         await User.findOne({
+            //             attributes: ['id'],
+            //             where: {
+            //                 authToken: request.body.authToken,
+            //             },
+            //         }).then(async (user) => {
+            //             if (user) {
+
+            //                 GroupMember.create({
+            //                     userId: user.id,
+            //                     groupId: group.id,
+            //                 })
+            //                 console.log(user.id);
+            //                 response.send({
+            //                     status: 200,
+            //                     message: "Success",
+            //                 })
+            //             } else {
+            //                 console.log('not creating group members');
+            //             }
+            //         })
+            //     } else {
+            //         console.log('not');
+            //     }
+            // });
+
+        } catch (error) {
+            next(error);
+        }
+        return undefined;
+    }
+
+
+
+
+
+
+
     async getGroupList(request, response, next) {
         // currentDate = new moment();
         await User.findOne({
@@ -111,6 +186,9 @@ class GroupController {
         })
 
     }
+
+
+
     joinGroup() {
 
     }

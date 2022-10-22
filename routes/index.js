@@ -17,9 +17,12 @@ router.post('/signup', AuthController.auth);
 router.post('/login', AuthController.login);
 router.post(`/verify/:token`, AuthController.verify);
 
-router.post(`/getRestaurantList`, RestaurantController.getRestaurantList);
+router.post(`/get-restaurant-list-api`, RestaurantController.getRestaurantListFromAPI);
+
+// router.post(`/get-restaurant-list-api`, RestaurantController.getRestaurantList);
 
 router.post('/createGroup', GroupController.createGroup);
+router.post('/createRandomGroup', GroupController.createRandomGroup);
 router.post('/joinGroup', GroupController.joinGroup);
 router.post('/joinRandomGroup', GroupController.joinRandomGroup);
 router.get('/getGroupList', GroupController.getGroupList);
