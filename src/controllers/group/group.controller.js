@@ -25,7 +25,6 @@ class GroupController {
                 userId: user.id,
                 groupId: group.id,
               });
-              console.log(user.id);
               response.send({
                 status: 200,
                 message: 'Success',
@@ -104,17 +103,13 @@ class GroupController {
                 attributes: ['name'],
               },
             ],
-          })
-            .then((result) => {
-              response.send({
-                status: 200,
-                message: 'Success',
-                data: result,
-              });
-            })
-            .catch((error) => {
-              console.log(error);
+          }).then((result) => {
+            response.send({
+              status: 200,
+              message: 'Success',
+              data: result,
             });
+          });
         } else {
           response.send({
             status: 400,
@@ -126,9 +121,92 @@ class GroupController {
         console.log(error);
       });
   }
+  async joinRandomGroup(request, response, next) {
+    try {
+      let { userId, officeId } = await User.findOne({
+        attributes: ['id', 'officeId'],
+        where: {
+          authToken: request.body.authToken,
+        },
+      })
+        .then(async (user) => {
+          if (user) {
+            return { userId: user.id, officeId: user.officeId };
+          } else return null;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
 
-  joinGroup() {}
-  joinRandomGroup() {}
+      const groupIds = await Group.findAll({
+        // attributes: ['id', 'officeId', 'restaurantId'],
+        attributes: ['id'],
+        where: {
+          officeId: officeId,
+          time: { [Op.gte]: new Date() },
+        },
+      })
+        .then((result) => {
+          if (result) {
+            return result.map((res) => res.id);
+          } else return [];
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+
+      if (!groupIds.length) {
+        response.status(400).send({
+          message: 'No group to join',
+        });
+      }
+
+      let min = 0;
+      let max = groupIds.length;
+
+      let random = 1;
+      while (random >= 0) {
+        random = Math.floor(Math.random() * (max - min) + min);
+        console.log(groupIds);
+        console.log(random);
+        let groupId = groupIds[random];
+        console.log('group id: ', groupId);
+        const groupMember = await GroupMember.findOne({
+          attributes: ['userId'],
+          where: {
+            userId: userId,
+            groupId: groupId,
+          },
+        });
+        console.log(groupMember.userId);
+        if (!!groupMember && groupMember.userId) {
+        } else {
+          console.log('in no result');
+          await GroupMember.create({
+            userId: userId,
+            groupId: groupId,
+          })
+            .then(() => {
+              console.log('member created');
+              random = -1;
+              return;
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+          random = -1;
+        }
+      }
+
+      response.send({
+        status: 200,
+        message: 'success. user joined the group',
+      });
+    } catch (error) {
+      next(error);
+    }
+    return undefined;
+  }
 }
 
 module.exports = new GroupController();
