@@ -15,7 +15,7 @@ phases:
   build:
     commands:
       - echo Starting to run migrations
-      - sequelize --options-path ./.sequelize db:migrate
+      - npm run migrate
       - echo Starting npm build
 artifacts:
   files:
