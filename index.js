@@ -1,6 +1,6 @@
-const database = require('../config/config');
+const database = require('./config/config');
 require('dotenv').config();
-const app = require('../app');
+const app = require('./app');
 const initApp = () => {
   new Promise((resolve) => {
     database.authenticate();
