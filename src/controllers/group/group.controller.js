@@ -15,6 +15,7 @@ const {
 
 class GroupController {
   async createCustomGroup(request, response, next) {
+    const authToken = request.headers.authorization;
     try {
       let {
         userId,
@@ -22,7 +23,7 @@ class GroupController {
       } = await User.findOne({
           attributes: ['id', 'officeId'],
           where: {
-            authToken: request.body.authToken,
+            authToken,
           },
         })
         .then(async (user) => {
@@ -63,10 +64,8 @@ class GroupController {
   }
 
   async createRandomGroup(request, response, next) {
+    const authToken = request.headers.authorization;
     try {
-
-
-
       var test = moment(request.body.startTime).diff(moment(request.body.endTime), 'minutes');
       var timeDifference = Math.abs(test);
 
@@ -76,22 +75,13 @@ class GroupController {
       var time = randomTime * 15;
 
       var finalTime = moment.parseZone(moment(request.body.startTime).add(time, 'minutes')).local(true).format();
-
-
-
-      // response.send({
-      //   data: [request.body.startTime, finalTime, random, moment.parseZone(finalTime).local(true).format()]
-      // });
-
-
-
       let {
         userId,
         officeId
       } = await User.findOne({
           attributes: ['id', 'officeId'],
           where: {
-            authToken: request.body.authToken,
+            authToken,
           },
         })
         .then(async (user) => {
@@ -216,21 +206,22 @@ class GroupController {
   }
 
   async getGroupsList(request, response, next) {
+    const authToken = request.headers.authorization;
     try {
       await User.findOne({
           attributes: ['id', 'officeId', 'authToken'],
           where: {
-            authToken: request.body.authToken,
+            authToken,
           },
         })
         .then(async (user) => {
           if (user) {
             Group.findAll({
-              attributes: ['id', 'officeId', 'restaurantId'],
+              attributes: ['id', 'officeId', 'restaurantId', 'time'],
               where: {
                 officeId: user.officeId,
                 time: {
-                  [Op.gte]: new Date(),
+                  [Op.gte]: new Date(), //gte = greater than equal to
                 },
               },
               include: [{
@@ -273,11 +264,12 @@ class GroupController {
   }
 
   async joinGroup(request, response, next) {
+    const authToken = request.headers.authorization;
     try {
       await User.findOne({
         attributes: ['id'],
         where: {
-          authToken: request.body.authToken,
+          authToken,
         },
       }).then(async (user) => {
         if (user) {
@@ -304,6 +296,7 @@ class GroupController {
   }
 
   async joinRandomGroup(request, response, next) {
+    const authToken = request.headers.authorization;
     try {
       let {
         userId,
@@ -311,7 +304,7 @@ class GroupController {
       } = await User.findOne({
           attributes: ['id', 'officeId'],
           where: {
-            authToken: request.body.authToken,
+            authToken,
           },
         })
         .then(async (user) => {
@@ -327,14 +320,25 @@ class GroupController {
         });
 
 
-
+      const {
+        startTime,
+        endTime
+      } = request.body
       const groupIds = await Group.findAll({
           attributes: ['id'],
           where: {
             officeId: officeId,
-            time: {
-              [Op.gte]: new Date()
-            },
+            [Op.and]: [{
+                time: {
+                  [Op.gte]: new moment(startTime)
+                }
+              },
+              {
+                time: {
+                  [Op.lte]: new moment(endTime)
+                }
+              }
+            ]
           },
         })
         .then((result) => {
