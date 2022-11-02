@@ -356,45 +356,41 @@ class GroupController {
         });
       }
 
-      let random = 1;
-      while (random >= 0) {
-        random = Math.floor(Math.random() * groupIds.length);
+      await GroupMember.findOne({
+        attributes: ['groupId'],
+        where: {
+          userId: userId,
+        },
+      }).then(async (groupMemberResult) => {
+        let random = Math.floor(Math.random() * groupIds.length);
         let groupId = groupIds[random];
-        const groupMember = await GroupMember.findOne({
-          attributes: ['userId'],
-          where: {
-            userId: userId,
-            groupId: groupId,
-          },
-        });
-        random = -1;
-        if (!groupMember) {
-          await GroupMember.create({
-              userId: userId,
-              groupId: groupId,
-            })
-            .then(() => {
-              random = -1;
-              response.send({
-                status: 200,
-                message: 'Group joined successfully',
-              });
-            })
-            .catch((error) => {
-              console.log(error);
-              response.status(400).send({
-                message: 'Group could not be joined',
-              });
-              random = -1;
-            });
-        } else if (groupIds.length === 1) {
-          response.send({
-            status: 200,
-            message: 'Group already joined',
-          });
-          random = -1;
+        if (groupMemberResult) {
+          const filteredGroups = groupIds.filter((id) => id !== groupMemberResult.groupId);
+          random = Math.floor(Math.random() * groupIds.length);
+          groupId = filteredGroups[random];
+          await GroupMember.destroy({
+            where: {
+              userId
+            }
+          })
         }
-      }
+        await GroupMember.create({
+            userId: userId,
+            groupId,
+          })
+          .then(() => {
+            response.status(200).send({
+              message: 'Group joined successfully',
+            });
+          })
+          .catch((error) => {
+            console.log(error);
+            response.status(400).send({
+              message: 'Group could not be joined',
+            });
+          });
+      })
+
     } catch (error) {
       next(error);
     }
