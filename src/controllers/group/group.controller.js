@@ -1,7 +1,7 @@
-const Models = require("../../../models");
-const moment = require("moment");
-const sequelize = require("sequelize");
-const Sequelize = require("../../../config/config");
+const Models = require('../../../models');
+const moment = require('moment');
+const sequelize = require('sequelize');
+const Sequelize = require('../../../config/config');
 const { Op, QueryTypes } = sequelize;
 const { Group, GroupMember, User, Restaurant } = Models;
 
@@ -10,7 +10,7 @@ class GroupController {
     const authToken = request.headers.authorization;
     try {
       let { userId, officeId } = await User.findOne({
-        attributes: ["id", "officeId"],
+        attributes: ['id', 'officeId'],
         where: {
           authToken,
         },
@@ -35,11 +35,11 @@ class GroupController {
           });
           response.send({
             status: 200,
-            message: "Success",
+            message: 'Success',
           });
         } else {
           response.status(400).send({
-            message: "Group not created",
+            message: 'Group not created',
           });
         }
       });
@@ -53,7 +53,7 @@ class GroupController {
     const authToken = request.headers.authorization;
     try {
       let { userId, officeId } = await User.findOne({
-        attributes: ["id", "officeId"],
+        attributes: ['id', 'officeId'],
         where: {
           authToken,
         },
@@ -80,7 +80,7 @@ class GroupController {
 
       if (!nearByRestaurants.length) {
         response.status(400).send({
-          message: "No restaurant found",
+          message: 'No restaurant found',
         });
       }
 
@@ -89,7 +89,7 @@ class GroupController {
         random = Math.floor(Math.random() * nearByRestaurants.length);
         let restaurantId = nearByRestaurants[random];
         const group = await Group.findOne({
-          attributes: ["id"],
+          attributes: ['id'],
           where: {
             restaurantId,
             officeId,
@@ -110,26 +110,26 @@ class GroupController {
                 });
               } else {
                 response.status(400).send({
-                  message: "Group not joined",
+                  message: 'Group not joined',
                 });
               }
               random = -1;
               response.send({
                 status: 200,
-                message: "Group created successfully",
+                message: 'Group created successfully',
               });
             })
             .catch((error) => {
               console.log(error);
               response.status(400).send({
-                message: "Group could not be created",
+                message: 'Group could not be created',
               });
               random = -1;
             });
         } else if (nearByRestaurants.length === 1) {
           response.send({
             status: 200,
-            message: "No new restaurant to create new group",
+            message: 'No new restaurant to create new group',
           });
           random = -1;
         }
@@ -144,7 +144,7 @@ class GroupController {
     const authToken = request.headers.authorization;
     try {
       await User.findOne({
-        attributes: ["id", "officeId", "authToken"],
+        attributes: ['id', 'officeId', 'authToken'],
         where: {
           authToken,
         },
@@ -152,7 +152,7 @@ class GroupController {
         .then(async (user) => {
           if (user) {
             Group.findAll({
-              attributes: ["id", "officeId", "restaurantId", "time"],
+              attributes: ['id', 'officeId', 'restaurantId', 'time'],
               where: {
                 officeId: user.officeId,
                 time: {
@@ -162,33 +162,33 @@ class GroupController {
               include: [
                 {
                   model: GroupMember,
-                  as: "groupMember",
-                  attributes: ["userId"],
+                  as: 'groupMember',
+                  attributes: ['userId'],
                   include: [
                     {
                       model: User,
-                      as: "user",
-                      attributes: ["name"],
+                      as: 'user',
+                      attributes: ['name'],
                     },
                   ],
                 },
                 {
                   model: Restaurant,
-                  as: "restaurant",
-                  attributes: ["name"],
+                  as: 'restaurant',
+                  attributes: ['name'],
                 },
               ],
             }).then((result) => {
               response.send({
                 status: 200,
-                message: "Success",
+                message: 'Success',
                 data: result,
               });
             });
           } else {
             response.send({
               status: 400,
-              message: "Could not get user",
+              message: 'Could not get user',
             });
           }
         })
@@ -205,7 +205,7 @@ class GroupController {
     const authToken = request.headers.authorization;
     try {
       await User.findOne({
-        attributes: ["id"],
+        attributes: ['id'],
         where: {
           authToken,
         },
@@ -218,12 +218,12 @@ class GroupController {
 
           response.send({
             status: 200,
-            message: "Group member is added",
+            message: 'Group member is added',
           });
         } else {
           response.send({
             status: 400,
-            message: "No user found",
+            message: 'No user found',
           });
         }
       });
@@ -237,7 +237,7 @@ class GroupController {
     const authToken = request.headers.authorization;
     try {
       let { userId, officeId } = await User.findOne({
-        attributes: ["id", "officeId"],
+        attributes: ['id', 'officeId'],
         where: {
           authToken,
         },
@@ -252,7 +252,7 @@ class GroupController {
         });
 
       const groupIds = await Group.findAll({
-        attributes: ["id"],
+        attributes: ['id'],
         where: {
           officeId: officeId,
           time: { [Op.gte]: new Date() }, //gte = greater than equals to
@@ -269,7 +269,7 @@ class GroupController {
 
       if (!groupIds.length) {
         response.status(400).send({
-          message: "No group to join",
+          message: 'No group to join',
         });
       }
 
@@ -278,7 +278,7 @@ class GroupController {
         random = Math.floor(Math.random() * groupIds.length);
         let groupId = groupIds[random];
         const groupMember = await GroupMember.findOne({
-          attributes: ["userId"],
+          attributes: ['userId'],
           where: {
             userId: userId,
             groupId: groupId,
@@ -294,20 +294,20 @@ class GroupController {
               random = -1;
               response.send({
                 status: 200,
-                message: "Group joined successfully",
+                message: 'Group joined successfully',
               });
             })
             .catch((error) => {
               console.log(error);
               response.status(400).send({
-                message: "Group could not be joined",
+                message: 'Group could not be joined',
               });
               random = -1;
             });
         } else if (groupIds.length === 1) {
           response.send({
             status: 200,
-            message: "Group already joined",
+            message: 'Group already joined',
           });
           random = -1;
         }
