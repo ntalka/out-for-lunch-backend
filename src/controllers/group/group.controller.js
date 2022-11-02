@@ -7,11 +7,12 @@ const { Group, GroupMember, User, Restaurant } = Models;
 
 class GroupController {
   async createCustomGroup(request, response, next) {
+    const authToken = request.headers.authorization;
     try {
       let { userId, officeId } = await User.findOne({
         attributes: ['id', 'officeId'],
         where: {
-          authToken: request.body.authToken,
+          authToken,
         },
       })
         .then(async (user) => {
@@ -49,11 +50,12 @@ class GroupController {
   }
 
   async createRandomGroup(request, response, next) {
+    const authToken = request.headers.authorization;
     try {
       let { userId, officeId } = await User.findOne({
         attributes: ['id', 'officeId'],
         where: {
-          authToken: request.body.authToken,
+          authToken,
         },
       })
         .then(async (user) => {
@@ -139,11 +141,12 @@ class GroupController {
   }
 
   async getGroupsList(request, response, next) {
+    const authToken = request.headers.authorization;
     try {
       await User.findOne({
         attributes: ['id', 'officeId', 'authToken'],
         where: {
-          authToken: request.body.authToken,
+          authToken,
         },
       })
         .then(async (user) => {
@@ -199,11 +202,12 @@ class GroupController {
   }
 
   async joinGroup(request, response, next) {
+    const authToken = request.headers.authorization;
     try {
       await User.findOne({
         attributes: ['id'],
         where: {
-          authToken: request.body.authToken,
+          authToken,
         },
       }).then(async (user) => {
         if (user) {
@@ -230,11 +234,12 @@ class GroupController {
   }
 
   async joinRandomGroup(request, response, next) {
+    const authToken = request.headers.authorization;
     try {
       let { userId, officeId } = await User.findOne({
         attributes: ['id', 'officeId'],
         where: {
-          authToken: request.body.authToken,
+          authToken,
         },
       })
         .then(async (user) => {
