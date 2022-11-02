@@ -64,179 +64,150 @@ class GroupController {
 
   async createRandomGroup(request, response, next) {
     try {
-      let {
-        userId,
-        officeId
-      } = await User.findOne({
-          attributes: ['id', 'officeId'],
-          where: {
-            authToken: request.body.authToken,
-          },
-        })
-        .then(async (user) => {
-          if (user) {
-            return {
-              userId: user.id,
-              officeId: user.officeId
-            };
-          } else return null;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
 
-      let filteredRestaurants = [];
 
-      const nearByRestaurants = await Sequelize.query(
-        `SELECT id FROM restaurants WHERE JSON_CONTAINS(nearby_office, \'[${officeId}]\')`, {
-          type: QueryTypes.SELECT,
-        }
-      ).then((resp) => {
-        if (resp) {
-          return resp.map((rest) => rest.id);
-        } else return [];
+
+      var test = moment(request.body.startTime).diff(moment(request.body.endTime), 'minutes');
+      var timeDifference = Math.abs(test);
+
+      var slotCount = timeDifference / 15;
+      var random = Math.floor(Math.random() * slotCount);
+
+      var startTime = moment(request.body.startTime);
+
+      var time = random * 15;
+
+      var finalTime = moment(request.body.startTime).add(time, 'minutes');
+
+
+
+      response.send({
+        data: [request.body.startTime, finalTime, random, moment.parseZone(finalTime).local(true).format()]
       });
 
-      if (!nearByRestaurants.length) {
-        response.status(400).send({
-          message: 'No restaurant found',
-        });
-      }
-
-      var random = 0;
 
 
-      await GroupMember.findOne({
-        // attributes: ['user', 'officeId'],
-        where: {
-          userId: userId,
-        },
-      }).then(async (groupMemberResult) => {
-        if (groupMemberResult) {
-
-          await Group.findOne({
-            where: {
-              id: groupMemberResult.groupId
-            }
-          }).then(async (groupResult) => {
-            if (groupResult) {
-              filteredRestaurants = nearByRestaurants.filter((filterItem) => filterItem !== groupResult.restaurantId);
-              random = Math.floor(Math.random() * filteredRestaurants.length);
-              let restaurantId = filteredRestaurants[random];
-              await Group.create({
-                restaurantId,
-                officeId,
-                time: new moment(request.body.time),
-              }).then(async (result) => {
-
-                await GroupMember.destroy({
-                  where: {
-                    userId: userId
-                  }
-                })
-                await GroupMember.create({
-                  userId: userId,
-                  groupId: result.id
-                })
-
-              })
-
-              response.send({
-                status: 200,
-                message: 'New Group Created successfully',
-              });
-            } else {
-              response.send({
-                status: 400,
-                message: 'Error finding previous group',
-              });
-            }
-          })
-        } else {
-          // filteredRestaurants = nearByRestaurants.map().filter((filterItem) => filterItem.id === groupResult.restaurantId);
-          random = Math.floor(Math.random() * nearByRestaurants.length);
-          let restaurantId = nearByRestaurants[random];
-
-          await Group.create({
-            restaurantId,
-            officeId,
-            time: new moment(request.body.time),
-          }).then(async (result) => {
-            await GroupMember.destroy({
-              where: {
-                userId: userId
-              }
-            })
-            await GroupMember.create({
-              userId: userId,
-              groupId: result.id
-            })
-
-          })
-
-          response.send({
-            status: 200,
-            message: 'Group Created successfully',
-          });
-        }
-      })
-
-      ///////////////////////////////////////////////////////
-      // while (random >= 0) {
-
-      //   let restaurantId = nearByRestaurants[random];
-
-      //   const group = await Group.findOne({
-      //     attributes: ['id'],
+      // let {
+      //   userId,
+      //   officeId
+      // } = await User.findOne({
+      //     attributes: ['id', 'officeId'],
       //     where: {
-      //       restaurantId,
-      //       officeId,
+      //       authToken: request.body.authToken,
       //     },
+      //   })
+      //   .then(async (user) => {
+      //     if (user) {
+      //       return {
+      //         userId: user.id,
+      //         officeId: user.officeId
+      //       };
+      //     } else return null;
+      //   })
+      //   .catch((error) => {
+      //     console.log(error);
       //   });
-      //   filteredRestaurant = nearByRestaurants.map().filter((filterItem) => filterItem.id === group.restaurantId);
-      //   random = Math.floor(Math.random() * filteredRestaurant.length);
+
+      // let filteredRestaurants = [];
+
+      // const nearByRestaurants = await Sequelize.query(
+      //   `SELECT id FROM restaurants WHERE JSON_CONTAINS(nearby_office, \'[${officeId}]\')`, {
+      //     type: QueryTypes.SELECT,
+      //   }
+      // ).then((resp) => {
+      //   if (resp) {
+      //     return resp.map((rest) => rest.id);
+      //   } else return [];
+      // });
+
+      // if (!nearByRestaurants.length) {
+      //   response.status(400).send({
+      //     message: 'No restaurant found',
+      //   });
+      // }
+
+      // var random = 0;
 
 
+      // await GroupMember.findOne({
+      //   // attributes: ['user', 'officeId'],
+      //   where: {
+      //     userId: userId,
+      //   },
+      // }).then(async (groupMemberResult) => {
+      //   if (groupMemberResult) {
 
-      //   random = -1;
-      //   if (!group) {
-      //     await Group.create({
-      //         restaurantId,
-      //         officeId,
-      //         time: new moment(request.body.time),
-      //       })
-      //       .then(async (group) => {
-      //         if (group) {
+      //     await Group.findOne({
+      //       where: {
+      //         id: groupMemberResult.groupId
+      //       }
+      //     }).then(async (groupResult) => {
+      //       if (groupResult) {
+      //         filteredRestaurants = nearByRestaurants.filter((filterItem) => filterItem !== groupResult.restaurantId);
+      //         random = Math.floor(Math.random() * filteredRestaurants.length);
+      //         let restaurantId = filteredRestaurants[random];
+      //         await Group.create({
+      //           restaurantId,
+      //           officeId,
+      //           time: new moment(request.body.time),
+      //         }).then(async (result) => {
+
+      //           await GroupMember.destroy({
+      //             where: {
+      //               userId: userId
+      //             }
+      //           })
       //           await GroupMember.create({
-      //             userId,
-      //             groupId: group.id,
-      //           });
-      //         } else {
-      //           response.status(400).send({
-      //             message: 'Group not joined',
-      //           });
-      //         }
-      //         random = -1;
+      //             userId: userId,
+      //             groupId: result.id
+      //           })
+
+      //         })
+
       //         response.send({
       //           status: 200,
-      //           message: 'Group created successfully',
+      //           message: 'New Group Created successfully',
       //         });
+      //       } else {
+      //         response.send({
+      //           status: 400,
+      //           message: 'Error finding previous group',
+      //         });
+      //       }
+      //     })
+      //   } else {
+      //     // filteredRestaurants = nearByRestaurants.map().filter((filterItem) => filterItem.id === groupResult.restaurantId);
+      //     random = Math.floor(Math.random() * nearByRestaurants.length);
+      //     let restaurantId = nearByRestaurants[random];
+
+      //     await Group.create({
+      //       restaurantId,
+      //       officeId,
+      //       time: new moment(request.body.time),
+      //     }).then(async (result) => {
+      //       await GroupMember.destroy({
+      //         where: {
+      //           userId: userId
+      //         }
       //       })
-      //       .catch((error) => {
-      //         console.log(error);
-      //         response.status(400).send({
-      //           message: 'Group could not be created',
-      //         });
-      //         random = -1;
-      //       });
-      //   } else if (nearByRestaurants.length === 1) {
+      //       await GroupMember.create({
+      //         userId: userId,
+      //         groupId: result.id
+      //       })
+
+      //     })
+
       //     response.send({
       //       status: 200,
-      //       message: 'No new restaurant to create new group',
+      //       message: 'Group Created successfully',
       //     });
-      //     random = -1;
       //   }
-      // }
+      // })
+
+
+
+
+
     } catch (error) {
       next(error);
     }
@@ -353,6 +324,8 @@ class GroupController {
         .catch((error) => {
           console.log(error);
         });
+
+
 
       const groupIds = await Group.findAll({
           attributes: ['id'],
