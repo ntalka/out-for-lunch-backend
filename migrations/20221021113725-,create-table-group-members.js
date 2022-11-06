@@ -1,17 +1,21 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('group_members', {
+      id: {
+        type: Sequelize.INTEGER,
+        autoIncrement: true,
+        allowNull: false,
+        primaryKey: true,
+      },
       userId: {
         field: 'user_id',
         type: Sequelize.INTEGER,
         allowNull: false,
-        primaryKey: true,
       },
       groupId: {
         field: 'group_id',
         type: Sequelize.INTEGER,
         allowNull: false,
-        primaryKey: true,
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -20,6 +24,10 @@ module.exports = {
       updatedAt: {
         type: Sequelize.DATE,
         field: 'updated_at',
+      },
+      deletedAt: {
+        type: Sequelize.DATE,
+        field: 'deleted_at',
       },
     });
   },
