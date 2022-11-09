@@ -397,6 +397,8 @@ class GroupController {
   async deleteGroup(request, response, next) {
     var groupId = request.params.groupId;
     try {
+      console.log('deleting a group here');
+
       await Group.destroy({
         where: {
           id: groupId,
