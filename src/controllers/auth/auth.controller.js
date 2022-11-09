@@ -55,6 +55,35 @@ class AuthController {
     return undefined;
   }
 
+  async resendAuthToken(request, response, next) {
+    try {
+      const email = request.body.email;
+
+      await User.findOne({
+        // attributes: ['email'],
+        where: {
+          email: email,
+        },
+      }).then(async (user) => {
+        if (user) {
+          var verificationLink = `${process.env.web_url}/verify/${user.authToken}`;
+
+          var message =
+            'Click on this link to verify your email: ' +
+            `<a  href="${verificationLink}"> Click here </a>`;
+          await sendEmail(request.body.email, 'Verify Email', message);
+          return response.status(200).send({
+            message: 'Email sent',
+            authToken: user.authToken,
+          });
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
+    return undefined;
+  }
+
   async login(request, response, next) {
     try {
       var email = request.body.email;
