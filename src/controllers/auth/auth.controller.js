@@ -135,18 +135,6 @@ class AuthController {
                 message: 'Email verified',
               });
             });
-            //////////////////////////////
-            // db.query(
-            //   `UPDATE users SET verified = 1 WHERE auth_token ='${token}'`,
-            //   function (err, result) {
-            //     console.log(result.affectedRows);
-
-            //     return response.send({
-            //       status: 200,
-            //       message: 'Email verified',
-            //     });
-            //   }
-            // );
           } else {
             return response.send({
               status: 202,
@@ -160,38 +148,6 @@ class AuthController {
           });
         }
       });
-
-      ////////////////////////////////
-      // db.query(
-      //   `select verified from users where auth_token ='${token}'`,
-      //   function (err, result) {
-      //     if (result.length > 0) {
-      //       if (result[0].verified === 0) {
-      //         db.query(
-      //           `UPDATE users SET verified = 1 WHERE auth_token ='${token}'`,
-      //           function (err, result) {
-      //             console.log(result.affectedRows);
-
-      //             return response.send({
-      //               status: 200,
-      //               message: 'Email verified',
-      //             });
-      //           }
-      //         );
-      //       } else {
-      //         return response.send({
-      //           status: 202,
-      //           message: 'Email already verified',
-      //         });
-      //       }
-      //     } else {
-      //       return response.send({
-      //         status: 400,
-      //         message: 'Email not verified',
-      //       });
-      //     }
-      //   }
-      // );
     } catch (e) {
       next(e);
     }
