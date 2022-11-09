@@ -224,6 +224,10 @@ class GroupController {
                   attributes: ['name'],
                 },
               ],
+              order: [
+                ['time', 'ASC'],
+                [{ model: Restaurant, as: 'restaurant' }, 'name', 'ASC'],
+              ],
             }).then((result) => {
               const formattedResult = result.map((group) => {
                 const isUserJoined = group.dataValues.groupMember.filter(
@@ -380,7 +384,6 @@ class GroupController {
     return undefined;
   }
 
-
   async deleteGroup(request, response, next) {
     var groupId = request.params.groupId;
     try {
@@ -389,7 +392,6 @@ class GroupController {
           id: groupId,
         },
       }).then((result) => {
-
         if (result) {
           response.send({
             status: 200,
@@ -401,16 +403,11 @@ class GroupController {
             message: `Failed to Delete Group : ${groupId}. Can not find the group`,
           });
         }
-
       });
-
-
     } catch (error) {
       next(error);
     }
   }
-
-
 }
 
 module.exports = new GroupController();
