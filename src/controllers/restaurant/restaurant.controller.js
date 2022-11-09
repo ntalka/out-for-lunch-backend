@@ -1,7 +1,14 @@
 var Axios = require('axios');
 const Models = require('../../../models');
+const sequelize = require('sequelize');
+const Sequelize = require('../../../config/config');
 const {
-    Restaurant
+    Op,
+    QueryTypes
+} = sequelize;
+const {
+    Restaurant,
+    User
 } = Models;
 
 class RestaurantController {
@@ -47,6 +54,59 @@ class RestaurantController {
             data: restaurants,
             data2: restaurants.length,
         });
+    }
+    async getRestaurantListFromOffice(req, res, next) {
+
+        const authToken = req.headers.authorization;;
+
+        try {
+            let {
+                officeId
+            } = await User.findOne({
+                attributes: ['id', 'officeId'],
+                where: {
+                    authToken,
+                },
+            }).then(async (userResult) => {
+                console.log(userResult);
+                if (userResult) {
+                    const nearByRestaurants = await Sequelize.query(
+                        `SELECT id,name FROM restaurants WHERE JSON_CONTAINS(nearby_office, \'[${userResult.officeId}]\')`, {
+                            type: QueryTypes.SELECT,
+                        }
+                    ).then((resp) => {
+                        if (resp) {
+
+                            resp.sort(function (a, b) {
+                                return a.name === b.name ? 0 : a.name < b.name ? -1 : 1;
+                            });
+                            return res.send({
+                                status: 200,
+                                message: 'Restaurant Fetched Successfully',
+                                data: resp,
+
+                            });
+                        } else {
+                            return res.send({
+                                status: 400,
+                                message: 'Failed to fetch restaurant',
+
+                            });
+                        }
+                    });
+                } else {
+                    return res.send({
+                        status: 400,
+                        message: 'Failed to fetch user',
+
+                    });
+                }
+
+            })
+        } catch (error) {
+            next(error)
+        }
+
     }
 }
 
