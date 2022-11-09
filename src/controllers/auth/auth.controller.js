@@ -89,7 +89,14 @@ class AuthController {
       var email = request.body.email;
       var password = request.body.password;
       await User.findOne({
-        attributes: ['password', 'verified', 'authToken'],
+        attributes: [
+          'password',
+          'verified',
+          'authToken',
+          'name',
+          'email',
+          'officeId',
+        ],
         where: {
           email,
         },
@@ -109,6 +116,13 @@ class AuthController {
             return response.send({
               status: 200,
               authToken: result.authToken,
+
+              data: {
+                name: result.name,
+                email: result.email,
+                officeId: result.officeId,
+              },
+
               message: 'login done',
             });
           } else {
