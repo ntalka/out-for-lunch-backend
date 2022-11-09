@@ -379,6 +379,38 @@ class GroupController {
     }
     return undefined;
   }
+
+
+  async deleteGroup(request, response, next) {
+    var groupId = request.params.groupId;
+    try {
+      Group.destroy({
+        where: {
+          id: groupId,
+        },
+      }).then((result) => {
+
+        if (result) {
+          response.send({
+            status: 200,
+            message: `Successfully Deleted Group : ${groupId}`,
+          });
+        } else {
+          response.send({
+            status: 400,
+            message: `Failed to Delete Group : ${groupId}. Can not find the group`,
+          });
+        }
+
+      });
+
+
+    } catch (error) {
+      next(error);
+    }
+  }
+
+
 }
 
 module.exports = new GroupController();
