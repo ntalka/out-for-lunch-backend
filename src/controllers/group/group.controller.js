@@ -225,10 +225,16 @@ class GroupController {
                 },
               ],
             }).then((result) => {
+              const formattedResult = result.map((group) => {
+                const isUserJoined = group.dataValues.groupMember.filter(
+                  (gm) => gm.userId === user.id
+                );
+                return { ...group.dataValues, joined: isUserJoined.length > 0 };
+              });
               return response.send({
                 status: 200,
                 message: 'Success',
-                data: result,
+                data: formattedResult,
               });
             });
           } else {
