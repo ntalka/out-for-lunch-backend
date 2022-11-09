@@ -27,4 +27,6 @@ router.post('/join-random-group', GroupController.joinRandomGroup);
 router.get('/get-groups-list', GroupController.getGroupsList);
 router.delete(`/delete-group/:groupId`, GroupController.deleteGroup);
 
+router.post(`/get-restaurant-list-office`, RestaurantController.getRestaurantListFromOffice);
+
 module.exports = router;
