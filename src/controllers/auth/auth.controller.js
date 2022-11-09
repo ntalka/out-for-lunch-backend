@@ -73,10 +73,9 @@ class AuthController {
             `<a  href="${verificationLink}"> Click here </a>`;
           await sendEmail(request.body.email, 'Verify Email', message);
           return response.status(200).send({
-            message: user.authToken,
-            body: user.auth_token,
+            message: 'Email sent',
+            authToken: user.authToken,
           });
-        } else {
         }
       });
     } catch (error) {
