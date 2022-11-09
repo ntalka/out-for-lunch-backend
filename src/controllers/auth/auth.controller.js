@@ -13,7 +13,6 @@ class AuthController {
       const { email, password } = request.body;
 
       await User.findOne({
-        // attributes: ['email'],
         where: {
           email: request.body.email,
         },
@@ -23,8 +22,9 @@ class AuthController {
           var token = jwt.sign(email, password);
           var hashedPassword = bcrypt.hashSync(password);
           const name = email.split('@')[0];
-          const firstName = name.split('.')[0];
-          const lastName = name.split('.')[1];
+          const [firstName, lastName] = name.includes('.')
+            ? name.split('.')
+            : [name, ''];
           User.create({
             email,
             password: hashedPassword,
@@ -38,7 +38,7 @@ class AuthController {
           var message =
             'Click on this link to verify your email: ' +
             `<a  href="${verificationLink}"> Click here </a>`;
-          await sendEmail(request.body.email, 'Verify Email', message);
+          await sendEmail(email, 'Verify Email', message);
           return response.status(200).send({
             message: 'Email sent',
             authToken: token,
@@ -60,9 +60,9 @@ class AuthController {
       const email = request.body.email;
 
       await User.findOne({
-        // attributes: ['email'],
+        attributes: ['authToken'],
         where: {
-          email: email,
+          email,
         },
       }).then(async (user) => {
         if (user) {
@@ -71,7 +71,7 @@ class AuthController {
           var message =
             'Click on this link to verify your email: ' +
             `<a  href="${verificationLink}"> Click here </a>`;
-          await sendEmail(request.body.email, 'Verify Email', message);
+          await sendEmail(email, 'Verify Email', message);
           return response.status(200).send({
             message: 'Email sent',
             authToken: user.authToken,
@@ -91,7 +91,7 @@ class AuthController {
       await User.findOne({
         attributes: ['password', 'verified', 'authToken'],
         where: {
-          email: request.body.email,
+          email,
         },
       }).then(async (result) => {
         if (result) {
