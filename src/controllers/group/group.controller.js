@@ -418,6 +418,40 @@ class GroupController {
       next(error);
     }
   }
+
+  async leaveGroup(request, response, next) {
+    const authToken = request.headers.authorization;
+    try {
+      await User.findOne({
+        attributes: ['id'],
+        where: {
+          authToken,
+        },
+      }).then(async (user) => {
+        if (user) {
+          await GroupMember.destroy({
+            where: {
+              userId: user.id,
+              groupId: request.params.groupId,
+            },
+          });
+
+          return response.send({
+            status: 200,
+            message: 'Group member is deleted',
+          });
+        } else {
+          return response.status(400).send({
+            message: 'No user found',
+          });
+        }
+      });
+    } catch (error) {
+      console.log(error);
+      //next(error);
+    }
+    return undefined;
+  }
 }
 
 module.exports = new GroupController();
