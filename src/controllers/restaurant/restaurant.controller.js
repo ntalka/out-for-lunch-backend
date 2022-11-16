@@ -101,7 +101,6 @@ class RestaurantController {
 
                     });
                 }
-
             })
         } catch (error) {
             next(error)

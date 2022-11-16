@@ -280,8 +280,24 @@ class GroupController {
         where: {
           authToken,
         },
-      }).then(async (user) => {
+      }).
+      then(async (user) => {
         if (user) {
+          await GroupMember.findOne({
+            attributes: ['groupId'],
+            where: {
+              userId: user.id,
+            },
+          }).then(async (groupMemberResult) => {
+            if (groupMemberResult) {
+              await GroupMember.destroy({
+                where: {
+                  userId: user.id,
+                },
+              });
+            }
+          })
+
           await GroupMember.create({
             userId: user.id,
             groupId: request.body.groupId,
