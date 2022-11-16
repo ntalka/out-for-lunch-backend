@@ -274,8 +274,7 @@ class GroupController {
         where: {
           authToken,
         },
-      }).
-      then(async (user) => {
+      }).then(async (user) => {
         if (user) {
           await GroupMember.findOne({
             attributes: ['groupId'],
@@ -290,11 +289,11 @@ class GroupController {
                 },
               });
             }
-          })
+          });
 
           await GroupMember.create({
             userId: user.id,
-            groupId: request.body.groupId,
+            groupId: request.params.groupId,
           });
 
           return response.send({

@@ -28,7 +28,7 @@ router.get(
 
 router.post('/create-cutom-group', GroupController.createCustomGroup); //custom group
 router.post('/create-random-group', GroupController.createRandomGroup);
-router.post('/join-group', GroupController.joinGroup);
+router.post('/join-group/:groupId', GroupController.joinGroup);
 router.post('/join-random-group', GroupController.joinRandomGroup);
 router.get('/get-groups-list', GroupController.getGroupsList);
 router.delete(`/delete-group/:groupId`, GroupController.deleteGroup);
