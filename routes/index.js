@@ -1,8 +1,9 @@
 const express = require('express');
-var router = express.Router();
-var AuthController = require('../src/controllers/auth/auth.controller');
-var GroupController = require('../src/controllers/group/group.controller');
-var RestaurantController = require('../src/controllers/restaurant/restaurant.controller');
+const router = express.Router();
+const AuthController = require('../src/controllers/auth/auth.controller');
+const GroupController = require('../src/controllers/group/group.controller');
+const RestaurantController = require('../src/controllers/restaurant/restaurant.controller');
+const OfficeController = require('../src/controllers/office/office.controller');
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
@@ -20,6 +21,10 @@ router.post(
   `/get-restaurant-list-api`,
   RestaurantController.getRestaurantListFromAPI
 );
+router.get(
+  `/get-restaurant-list-office`,
+  RestaurantController.getRestaurantListFromOffice
+);
 
 router.post('/create-cutom-group', GroupController.createCustomGroup); //custom group
 router.post('/create-random-group', GroupController.createRandomGroup);
@@ -29,9 +34,6 @@ router.get('/get-groups-list', GroupController.getGroupsList);
 router.delete(`/delete-group/:groupId`, GroupController.deleteGroup);
 router.post(`/leave-group/:groupId`, GroupController.leaveGroup);
 
-router.get(
-  `/get-restaurant-list-office`,
-  RestaurantController.getRestaurantListFromOffice
-);
+router.post(`/add-office`, OfficeController.addOffice);
 
 module.exports = router;
