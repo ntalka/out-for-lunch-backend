@@ -15,6 +15,29 @@ class OfficeController {
       next(error);
     }
   }
+
+  async getOfficesList(req, res, next) {
+    try {
+      await Office.findAll({
+        attributes: ['id', 'name', 'location'],
+      }).then(async (Result) => {
+        if (Result) {
+          return res.send({
+            status: 200,
+            message: 'Offices Fetched Successfully',
+            data: Result,
+          });
+        } else {
+          return res.send({
+            status: 400,
+            message: 'Failed to fetch offices',
+          });
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = new OfficeController();

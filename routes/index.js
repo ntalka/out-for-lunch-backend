@@ -35,5 +35,6 @@ router.delete(`/delete-group/:groupId`, GroupController.deleteGroup);
 router.post(`/leave-group/:groupId`, GroupController.leaveGroup);
 
 router.post(`/add-office`, OfficeController.addOffice);
+router.get(`/get-offices-list`, OfficeController.getOfficesList);
 
 module.exports = router;
