@@ -36,5 +36,6 @@ router.post(`/leave-group/:groupId`, GroupController.leaveGroup);
 
 router.post(`/add-office`, OfficeController.addOffice);
 router.get(`/get-offices-list`, OfficeController.getOfficesList);
+router.post(`/eat-at-office`, OfficeController.eatAtOffice);
 
 module.exports = router;
