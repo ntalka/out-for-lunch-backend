@@ -2,8 +2,15 @@ let Axios = require('axios');
 const Models = require('../../../models');
 const sequelize = require('sequelize');
 const Sequelize = require('../../../config/config');
-const { Op, QueryTypes } = sequelize;
-const { Restaurant, User, Office } = Models;
+const {
+  Op,
+  QueryTypes
+} = sequelize;
+const {
+  Restaurant,
+  User,
+  Office
+} = Models;
 
 class RestaurantController {
   async getRestaurantListFromAPI(req, res, next) {
@@ -36,11 +43,15 @@ class RestaurantController {
               (restaurant) => restaurant.id
             );
             data.data.results.forEach((rest) => {
+
+              let location = rest.geometry.location.lat + "," + rest.geometry.location.lng;
+
               if (!restaurantIds.includes(rest.place_id)) {
                 restaurants.push({
                   id: rest.place_id,
                   name: rest.name,
                   nearByOffice: [officeId],
+                  location: location
                 });
               }
             });
@@ -63,7 +74,9 @@ class RestaurantController {
     const authToken = req.headers.authorization;
 
     try {
-      let { officeId } = await User.findOne({
+      let {
+        officeId
+      } = await User.findOne({
         attributes: ['id', 'officeId'],
         where: {
           authToken,
@@ -72,8 +85,7 @@ class RestaurantController {
         console.log(userResult);
         if (userResult) {
           const nearByRestaurants = await Sequelize.query(
-            `SELECT id,name FROM restaurants WHERE JSON_CONTAINS(nearby_office, \'[${userResult.officeId}]\')`,
-            {
+            `SELECT id,name FROM restaurants WHERE JSON_CONTAINS(nearby_office, \'[${userResult.officeId}]\')`, {
               type: QueryTypes.SELECT,
             }
           ).then((resp) => {

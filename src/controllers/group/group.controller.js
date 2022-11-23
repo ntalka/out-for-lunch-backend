@@ -1,8 +1,8 @@
 const Models = require('../../../models');
 const moment = require('moment');
 const sequelize = require('sequelize');
-const Sequelize = require('../../../config/config');
 const { Op, QueryTypes } = sequelize;
+const Sequelize = require('../../../config/config');
 const { Group, GroupMember, User, Restaurant } = Models;
 
 class GroupController {
@@ -27,7 +27,7 @@ class GroupController {
           console.log(error);
         });
       await Group.create({
-        time: new moment(request.body.time),
+        time: new moment.utc(request.body.time),
         officeId: officeId,
         restaurantId: request.body.restaurantId,
       }).then(async (group) => {
@@ -466,6 +466,30 @@ class GroupController {
       //next(error);
     }
     return undefined;
+  }
+
+  async updateRestaurant(request, response, next) {
+    var id = request.body.id;
+    var restaurantId = request.body.restaurantId;
+    console.log('asddddddddddddd');
+    await Group.findOne({
+      where: {
+        id,
+      },
+    }).then(async (group) => {
+      if (group) {
+        group.restaurantId = restaurantId;
+
+        await group.save();
+        response.status(200).send({
+          message: 'Restaurant changed Successfully',
+        });
+      } else {
+        response.status(400).send({
+          message: 'Failed to change restaurant',
+        });
+      }
+    });
   }
 }
 
