@@ -28,7 +28,7 @@ router.get(
 
 
 
-router.post('/update-restaurant-group', GroupController.updateRestaurant);
+router.post('/update-group/:id', GroupController.updateRestaurant);
 router.post('/create-custom-group', GroupController.createCustomGroup); //custom group
 router.post('/create-random-group', GroupController.createRandomGroup);
 router.post('/join-group/:groupId', GroupController.joinGroup);

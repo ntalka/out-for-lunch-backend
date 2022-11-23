@@ -487,18 +487,16 @@ class GroupController {
   }
 
   async updateRestaurant(request, response, next) {
-    var id = request.body.id;
-    var restaurantId = request.body.restaurantId;
-    console.log("asddddddddddddd")
+    const id = request.params.id;
+    const restaurantId = request.body.restaurantId;
+
     await Group.findOne({
       where: {
         id
       },
     }).then(async (group) => {
       if (group) {
-
         group.restaurantId = restaurantId;
-
         await group.save();
         response.status(200).send({
           message: 'Restaurant changed Successfully',
