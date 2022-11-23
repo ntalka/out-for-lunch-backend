@@ -42,19 +42,16 @@ class RestaurantController {
             const restaurantIds = restaurants.map(
               (restaurant) => restaurant.id
             );
-            console.log("ok " + data.data);
             data.data.results.forEach((rest) => {
 
-              res.status(200).send({
-                message: 'Successssssssssssss',
-                data: rest,
-              });
+              let location = rest.geometry.location.lat + "," + rest.geometry.location.lng;
 
               if (!restaurantIds.includes(rest.place_id)) {
                 restaurants.push({
                   id: rest.place_id,
                   name: rest.name,
                   nearByOffice: [officeId],
+                  location: location
                 });
               }
             });
