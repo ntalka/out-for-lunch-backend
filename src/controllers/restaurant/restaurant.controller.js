@@ -9,9 +9,9 @@ class RestaurantController {
   async getRestaurantListFromAPI(req, res, next) {
     let officeId = req.body.officeId || 1;
     const office = await Office.findOne({
+      attributes: ['location'],
       where: {
         id: officeId,
-        attributes: ['location'],
       },
     });
     if (!office) {
@@ -22,11 +22,11 @@ class RestaurantController {
     let officeLoc = office.location;
     let restaurants = [];
     let nextPageToken = 1;
-    let URL = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=${process.env.google_maps_api_key}&location=${officeLoc}&radius=${process.env.radius}`;
+    let URL = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=${process.env.google_maps_api_key}&location=${officeLoc}&radius=${process.env.radius}&type=restaurant`;
     while (!!nextPageToken) {
       if (nextPageToken && nextPageToken !== 1) {
         await new Promise((resolve) => setTimeout(resolve, 3000));
-        URL = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=${process.env.google_maps_api_key}&pagetoken=${nextPageToken}`;
+        URL = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=${process.env.google_maps_api_key}&pagetoken=${nextPageToken}&type=restaurant`;
       }
       await Axios.get(URL)
         .then((data) => {
@@ -57,7 +57,6 @@ class RestaurantController {
     res.status(200).send({
       message: 'Success',
       data: restaurants,
-      data2: restaurants.length,
     });
   }
   async getRestaurantListFromOffice(req, res, next) {
