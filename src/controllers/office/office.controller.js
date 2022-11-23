@@ -61,22 +61,32 @@ class OfficeController {
             officeId: user.officeId,
 
             time: {
-              [Op.eq]: new moment(time),
+              [Op.eq]: new moment.utc(req.body.time),
             },
           },
         }).then(async (result) => {
           if (result) {
+            await GroupMember.destroy({
+              where: {
+                userId: user.id,
+              },
+            });
             await GroupMember.create({
               userId: user.id,
               groupId: result.id,
             });
           } else {
             await Group.create({
-              time: new moment(req.body.time),
+              time: new moment.utc(req.body.time),
               officeId: user.officeId,
               restaurantId: '0',
             }).then(async (result) => {
               if (result) {
+                await GroupMember.destroy({
+                  where: {
+                    userId: user.id,
+                  },
+                });
                 await GroupMember.create({
                   userId: user.id,
                   groupId: result.id,
