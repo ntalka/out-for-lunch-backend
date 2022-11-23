@@ -2,19 +2,34 @@ const Models = require('../../../models');
 const moment = require('moment');
 const sequelize = require('sequelize');
 const Sequelize = require('../../../config/config');
-const { Op, QueryTypes } = sequelize;
-const { Group, GroupMember, User, Restaurant } = Models;
+const {
+  request,
+  response
+} = require('express');
+const {
+  Op,
+  QueryTypes
+} = sequelize;
+const {
+  Group,
+  GroupMember,
+  User,
+  Restaurant
+} = Models;
 
 class GroupController {
   async createCustomGroup(request, response, next) {
     const authToken = request.headers.authorization;
     try {
-      let { userId, officeId } = await User.findOne({
-        attributes: ['id', 'officeId'],
-        where: {
-          authToken,
-        },
-      })
+      let {
+        userId,
+        officeId
+      } = await User.findOne({
+          attributes: ['id', 'officeId'],
+          where: {
+            authToken,
+          },
+        })
         .then(async (user) => {
           if (user) {
             return {
@@ -70,12 +85,15 @@ class GroupController {
         .parseZone(moment(request.body.startTime).add(time, 'minutes'))
         .local(true)
         .format();
-      let { userId, officeId } = await User.findOne({
-        attributes: ['id', 'officeId'],
-        where: {
-          authToken,
-        },
-      })
+      let {
+        userId,
+        officeId
+      } = await User.findOne({
+          attributes: ['id', 'officeId'],
+          where: {
+            authToken,
+          },
+        })
         .then(async (user) => {
           if (user) {
             return {
@@ -91,8 +109,7 @@ class GroupController {
       let filteredRestaurants = [];
 
       const nearByRestaurants = await Sequelize.query(
-        `SELECT id FROM restaurants WHERE JSON_CONTAINS(nearby_office, \'[${officeId}]\')`,
-        {
+        `SELECT id FROM restaurants WHERE JSON_CONTAINS(nearby_office, \'[${officeId}]\')`, {
           type: QueryTypes.SELECT,
         }
       ).then((resp) => {
@@ -190,11 +207,11 @@ class GroupController {
     const authToken = request.headers.authorization;
     try {
       await User.findOne({
-        attributes: ['id', 'officeId', 'authToken'],
-        where: {
-          authToken,
-        },
-      })
+          attributes: ['id', 'officeId', 'authToken'],
+          where: {
+            authToken,
+          },
+        })
         .then(async (user) => {
           if (user) {
             await Group.findAll({
@@ -205,18 +222,15 @@ class GroupController {
                   [Op.gte]: new Date(), //gte = greater than equal to
                 },
               },
-              include: [
-                {
+              include: [{
                   model: GroupMember,
                   as: 'groupMember',
                   attributes: ['userId'],
-                  include: [
-                    {
-                      model: User,
-                      as: 'user',
-                      attributes: ['name'],
-                    },
-                  ],
+                  include: [{
+                    model: User,
+                    as: 'user',
+                    attributes: ['name'],
+                  }, ],
                 },
                 {
                   model: Restaurant,
@@ -226,8 +240,7 @@ class GroupController {
               ],
               order: [
                 ['time', 'ASC'],
-                [
-                  {
+                [{
                     model: Restaurant,
                     as: 'restaurant',
                   },
@@ -315,12 +328,15 @@ class GroupController {
   async joinRandomGroup(request, response, next) {
     const authToken = request.headers.authorization;
     try {
-      let { userId, officeId } = await User.findOne({
-        attributes: ['id', 'officeId'],
-        where: {
-          authToken,
-        },
-      })
+      let {
+        userId,
+        officeId
+      } = await User.findOne({
+          attributes: ['id', 'officeId'],
+          where: {
+            authToken,
+          },
+        })
         .then(async (user) => {
           if (user) {
             return {
@@ -333,25 +349,27 @@ class GroupController {
           console.log(error);
         });
 
-      const { startTime, endTime } = request.body;
+      const {
+        startTime,
+        endTime
+      } = request.body;
       const groupIds = await Group.findAll({
-        attributes: ['id'],
-        where: {
-          officeId: officeId,
-          [Op.and]: [
-            {
-              time: {
-                [Op.gte]: new moment(startTime),
+          attributes: ['id'],
+          where: {
+            officeId: officeId,
+            [Op.and]: [{
+                time: {
+                  [Op.gte]: new moment(startTime),
+                },
               },
-            },
-            {
-              time: {
-                [Op.lte]: new moment(endTime),
+              {
+                time: {
+                  [Op.lte]: new moment(endTime),
+                },
               },
-            },
-          ],
-        },
-      })
+            ],
+          },
+        })
         .then((result) => {
           if (result) {
             return result.map((res) => res.id);
@@ -388,9 +406,9 @@ class GroupController {
           });
         }
         await GroupMember.create({
-          userId: userId,
-          groupId,
-        })
+            userId: userId,
+            groupId,
+          })
           .then(() => {
             return response.status(200).send({
               message: 'Group joined successfully',
@@ -467,6 +485,35 @@ class GroupController {
     }
     return undefined;
   }
+
+  async updateRestaurant(request, response, next) {
+    var id = request.body.id;
+    var restaurantId = request.body.restaurantId;
+    console.log("asddddddddddddd")
+    await Group.findOne({
+      where: {
+        id
+      },
+    }).then(async (group) => {
+      if (group) {
+
+        group.restaurantId = restaurantId;
+
+        await group.save();
+        response.status(200).send({
+          message: 'Restaurant changed Successfully',
+        });
+      } else {
+        response.status(400).send({
+          message: 'Failed to change restaurant',
+        });
+      }
+
+    })
+
+  }
 }
+
+
 
 module.exports = new GroupController();
