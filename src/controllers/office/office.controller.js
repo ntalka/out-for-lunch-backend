@@ -1,5 +1,8 @@
+const sequelize = require('sequelize');
+const moment = require('moment');
 const Models = require('../../../models');
-const { Office } = Models;
+const { Office, User, GroupMember, Group } = Models;
+const { Op } = sequelize;
 
 class OfficeController {
   async addOffice(req, res, next) {
@@ -20,12 +23,12 @@ class OfficeController {
     try {
       await Office.findAll({
         attributes: ['id', 'name', 'location'],
-      }).then(async (Result) => {
-        if (Result) {
+      }).then(async (result) => {
+        if (result) {
           return res.send({
             status: 200,
             message: 'Offices Fetched Successfully',
-            data: Result,
+            data: result,
           });
         } else {
           return res.send({
@@ -35,6 +38,59 @@ class OfficeController {
         }
       });
     } catch (error) {
+      next(error);
+    }
+  }
+
+  async eatAtOffice(req, res, next) {
+    const authToken = req.headers.authorization;
+    let time = req.body.time;
+
+    try {
+      let user = await User.findOne({
+        attributes: ['id', 'officeId'],
+        where: {
+          authToken,
+        },
+      });
+
+      if (user) {
+        await Group.findOne({
+          attributes: ['id'],
+          where: {
+            officeId: user.officeId,
+
+            time: {
+              [Op.eq]: new moment(time),
+            },
+          },
+        }).then(async (result) => {
+          if (result) {
+            await GroupMember.create({
+              userId: user.id,
+              groupId: result.id,
+            });
+          } else {
+            await Group.create({
+              time: new moment(req.body.time),
+              officeId: user.officeId,
+              restaurantId: '0',
+            }).then(async (result) => {
+              if (result) {
+                await GroupMember.create({
+                  userId: user.id,
+                  groupId: result.id,
+                });
+              }
+            });
+          }
+        });
+      }
+      res.send({
+        message: 'Success',
+      });
+    } catch (error) {
+      console.log(error);
       next(error);
     }
   }
