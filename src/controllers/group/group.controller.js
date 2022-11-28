@@ -328,13 +328,12 @@ class GroupController {
         }
       });
     } catch (error) {
-      console.log(error);
-      //next(error);
+      next(error);
     }
     return undefined;
   }
 
-  async updateRestaurant(request, response, next) {
+  async updateGroup(request, response, next) {
     var id = request.body.id;
     var restaurantId = request.body.restaurantId;
     await Group.findOne({

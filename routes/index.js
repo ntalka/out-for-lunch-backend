@@ -4,6 +4,7 @@ const AuthController = require('../src/controllers/auth/auth.controller');
 const GroupController = require('../src/controllers/group/group.controller');
 const RestaurantController = require('../src/controllers/restaurant/restaurant.controller');
 const OfficeController = require('../src/controllers/office/office.controller');
+const UserController = require('../src/controllers/user/user.controller');
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
@@ -17,6 +18,8 @@ router.post('/login', AuthController.login);
 router.post(`/verify/:token`, AuthController.verify);
 router.post(`/resend-link`, AuthController.resendAuthToken);
 
+router.put(`/update-user`, UserController.updateUser);
+
 router.post(
   `/get-restaurant-list-api`,
   RestaurantController.getRestaurantListFromAPI
@@ -26,7 +29,7 @@ router.get(
   RestaurantController.getRestaurantListFromOffice
 );
 
-router.post('/update-restaurant-group', GroupController.updateRestaurant);
+router.put('/update-group', GroupController.updateGroup);
 router.post('/create-custom-group', GroupController.createCustomGroup); //custom group
 router.post('/join-group/:groupId', GroupController.joinGroup);
 router.post('/join-random-group', GroupController.joinRandomGroup);
