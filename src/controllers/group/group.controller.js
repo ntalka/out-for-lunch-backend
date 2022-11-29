@@ -1,8 +1,7 @@
 const Models = require('../../../models');
 const moment = require('moment');
 const sequelize = require('sequelize');
-const { Op, QueryTypes } = sequelize;
-const Sequelize = require('../../../config/config');
+const { Op } = sequelize;
 const { Group, GroupMember, User, Restaurant } = Models;
 
 class GroupController {
