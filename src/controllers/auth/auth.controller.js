@@ -5,7 +5,7 @@ var db = require('../../../config/config');
 require('dotenv').config;
 
 const Models = require('../../../models');
-const { User } = Models;
+const { User, Office } = Models;
 
 class AuthController {
   async auth(request, response, next) {
@@ -100,6 +100,13 @@ class AuthController {
         where: {
           email,
         },
+        include: [
+          {
+            model: Office,
+            as: 'office',
+            attributes: ['location'],
+          },
+        ],
       }).then(async (result) => {
         if (result) {
           if (!result.verified) {
@@ -121,6 +128,7 @@ class AuthController {
                 name: result.name,
                 email: result.email,
                 officeId: result.officeId,
+                location: result.office.location,
               },
 
               message: 'login done',

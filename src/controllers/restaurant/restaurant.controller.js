@@ -2,15 +2,8 @@ let Axios = require('axios');
 const Models = require('../../../models');
 const sequelize = require('sequelize');
 const Sequelize = require('../../../config/config');
-const {
-  Op,
-  QueryTypes
-} = sequelize;
-const {
-  Restaurant,
-  User,
-  Office
-} = Models;
+const { QueryTypes } = sequelize;
+const { Restaurant, User, Office } = Models;
 
 class RestaurantController {
   async getRestaurantListFromAPI(req, res, next) {
@@ -43,15 +36,15 @@ class RestaurantController {
               (restaurant) => restaurant.id
             );
             data.data.results.forEach((rest) => {
-
-              let location = rest.geometry.location.lat + "," + rest.geometry.location.lng;
+              const location =
+                rest.geometry.location.lat + ',' + rest.geometry.location.lng;
 
               if (!restaurantIds.includes(rest.place_id)) {
                 restaurants.push({
                   id: rest.place_id,
                   name: rest.name,
                   nearByOffice: [officeId],
-                  location: location
+                  location,
                 });
               }
             });
@@ -74,44 +67,40 @@ class RestaurantController {
     const authToken = req.headers.authorization;
 
     try {
-      let {
-        officeId
-      } = await User.findOne({
+      let user = await User.findOne({
         attributes: ['id', 'officeId'],
         where: {
           authToken,
         },
-      }).then(async (userResult) => {
-        console.log(userResult);
-        if (userResult) {
-          const nearByRestaurants = await Sequelize.query(
-            `SELECT id,name FROM restaurants WHERE JSON_CONTAINS(nearby_office, \'[${userResult.officeId}]\')`, {
-              type: QueryTypes.SELECT,
-            }
-          ).then((resp) => {
-            if (resp) {
-              resp.sort(function (a, b) {
-                return a.name === b.name ? 0 : a.name < b.name ? -1 : 1;
-              });
-              return res.send({
-                status: 200,
-                message: 'Restaurant Fetched Successfully',
-                data: resp,
-              });
-            } else {
-              return res.send({
-                status: 400,
-                message: 'Failed to fetch restaurant',
-              });
-            }
+      });
+      if (user) {
+        let nearByRestaurants = await Sequelize.query(
+          `SELECT id,name FROM restaurants WHERE JSON_CONTAINS(nearby_office, \'[${userResult.officeId}]\')`,
+          {
+            type: QueryTypes.SELECT,
+          }
+        );
+        if (nearByRestaurants) {
+          nearByRestaurants.sort(function (a, b) {
+            return a.name === b.name ? 0 : a.name < b.name ? -1 : 1;
+          });
+          return res.send({
+            status: 200,
+            message: 'Restaurant Fetched Successfully',
+            data: nearByRestaurants,
           });
         } else {
           return res.send({
             status: 400,
-            message: 'Failed to fetch user',
+            message: 'Failed to fetch restaurant',
           });
         }
-      });
+      } else {
+        return res.send({
+          status: 400,
+          message: 'Failed to fetch user',
+        });
+      }
     } catch (error) {
       next(error);
     }
