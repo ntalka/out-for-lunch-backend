@@ -10,8 +10,7 @@ const initApp = () => {
   }).then(() => {
     const PORT = process.env.PORT || 3000;
     const restaurantJob = new CronJob(
-      '40 * * * *',
-      //'59 23 * * 0',
+      '59 23 * * 0',
       async () => {
         await RestaurantService.getRestaurantListFromAPI();
       },
