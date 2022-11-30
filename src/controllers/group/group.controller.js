@@ -12,6 +12,15 @@ const {
 } = Models;
 
 class GroupController {
+
+  /**
+   * Creates custom group
+   * 
+   * @param {number} request Authorization header
+   * @param {number} response 200 for success. 400 for failing
+   * @returns {number}
+   */
+
   async createCustomGroup(request, response, next) {
     const authToken = request.headers.authorization;
     try {
