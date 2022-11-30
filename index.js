@@ -1,5 +1,5 @@
 const database = require('./config/config');
-const { Office } = require('./models');
+const RestaurantService = require('./src/controllers/restaurant/restaurant.service');
 require('dotenv').config();
 const { CronJob } = require('cron');
 const app = require('./app');
@@ -10,13 +10,9 @@ const initApp = () => {
   }).then(() => {
     const PORT = process.env.PORT || 3000;
     const restaurantJob = new CronJob(
-      '1-59 * * * *',
+      '59 23 * * 0',
       async () => {
-        await Office.create({
-          name: 'xyz',
-          location: 'abc',
-        });
-        // console.log('job is running');
+        // await RestaurantService.getRestaurantListFromAPI();
       },
       null,
       true,
