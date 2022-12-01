@@ -12,7 +12,7 @@ const initApp = () => {
     const restaurantJob = new CronJob(
       '59 23 * * 0',
       async () => {
-        // await RestaurantService.getRestaurantListFromAPI();
+        await RestaurantService.getRestaurantListFromAPI();
       },
       null,
       true,
