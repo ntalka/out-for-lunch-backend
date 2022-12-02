@@ -77,6 +77,22 @@ class GroupController {
     return undefined;
   }
 
+
+
+  /**
+   * Gets all the groups from the user's current office
+   *
+   * @param {Object} request {
+   * headers: {
+   *  authorization: authToken
+   * }
+   * }
+   * @param {Object} response 200 for success. 400 for failing
+   * @returns {Object}
+   */
+
+
+
   async getGroupsList(request, response, next) {
     const authToken = request.headers.authorization;
     try {
@@ -153,6 +169,21 @@ class GroupController {
     return undefined;
   }
 
+
+  /**
+   * Joins a group with the given group id
+   *
+   * @param {Object} request {
+   * headers: {
+   *  authorization: authToken
+   * }
+   * }
+   * @param {Integer} id group id to join
+   * @param {Object} response 200 for success. 400 for failing
+   * @returns {Object}
+   */
+
+
   async joinGroup(request, response, next) {
     const authToken = request.headers.authorization;
     try {
@@ -198,6 +229,26 @@ class GroupController {
     }
     return undefined;
   }
+
+
+
+  /**
+   * Joins a random group between the given start time and endtime
+   *
+   * @param {Object} request {
+   * headers: {
+   *  authorization: authToken
+   * }
+   * body: {
+   *  startTime: String,
+   *  endTime: String
+   * },
+   * }
+   * @param {Integer} id group id to join
+   * @param {Object} response 200 for success. 400 for failing
+   * @returns {Object}
+   */
+
 
   async joinRandomGroup(request, response, next) {
     const authToken = request.headers.authorization;
@@ -301,6 +352,21 @@ class GroupController {
     return undefined;
   }
 
+
+
+  /**
+   * Deletes the group with the given group id
+   *
+   * @param {Object} request {
+   * headers: {
+   *  authorization: authToken
+   * }
+   * }
+   * @param {Integer} id group id to delete
+   * @param {Object} response 200 for success. 400 for failing
+   * @returns {Object}
+   */
+
   async deleteGroup(request, response, next) {
     var groupId = request.params.groupId;
     try {
@@ -325,6 +391,23 @@ class GroupController {
       next(error);
     }
   }
+
+
+
+
+  /**
+   * User leaves the group with the given group id
+   *
+   * @param {Object} request {
+   * headers: {
+   *  authorization: authToken
+   * }
+   * }
+   * @param {Integer} id group id to leave
+   * @param {Object} response 200 for success. 400 for failing
+   * @returns {Object}
+   */
+
 
   async leaveGroup(request, response, next) {
     const authToken = request.headers.authorization;
@@ -358,6 +441,23 @@ class GroupController {
     }
     return undefined;
   }
+
+  /**
+   * Updates the group with the given new restaurant id
+   *
+   * @param {Object} request {
+   * headers: {
+   *  authorization: authToken
+   * }
+   * }
+   * body: {
+   *  restaurantId: String
+   * },
+   * @param {Integer} id group id to update
+   * @param {Object} response 200 for success. 400 for failing
+   * @returns {Object}
+   */
+
 
   async updateGroup(request, response, next) {
     var id = request.params.id;
