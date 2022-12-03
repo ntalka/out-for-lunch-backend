@@ -2,6 +2,21 @@ const Models = require('../../../models');
 const { User } = Models;
 
 class UserController {
+  /**
+   * Update user with given office id
+   *
+   * @param {Object} request {
+   * body: {
+   *  officeId: Integer
+   * },
+   * headers: {
+   *  authorization: authToken
+   * }
+   * }
+   * @param {Object} response 200 for success. 400 for failing
+   * @returns {Object}
+   */
+
   async updateUser(req, res, next) {
     let officeId = req.body.officeId || 1;
     const authToken = req.headers.authorization;

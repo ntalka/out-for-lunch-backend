@@ -84,6 +84,19 @@ class AuthController {
     return undefined;
   }
 
+  /**
+   * Creates login with given email and password
+   *
+   * @param {Object} request {
+   * body: {
+   *  email: String,
+   *  password: String
+   * }
+   * }
+   * @param {Object} response 200 for success. 400 for failing
+   * @returns {Object}
+   */
+
   async login(request, response, next) {
     try {
       var email = request.body.email;
