@@ -178,7 +178,7 @@ class GroupController {
    *  authorization: authToken
    * }
    * }
-   * @param {Integer} id group id to join
+   * @param {Integer} groupId group id to join
    * @param {Object} response 200 for success. 400 for failing
    * @returns {Object}
    */
@@ -244,7 +244,6 @@ class GroupController {
    *  endTime: String
    * },
    * }
-   * @param {Integer} id group id to join
    * @param {Object} response 200 for success. 400 for failing
    * @returns {Object}
    */
@@ -362,7 +361,7 @@ class GroupController {
    *  authorization: authToken
    * }
    * }
-   * @param {Integer} id group id to delete
+   * @param {Integer} groupId group id to delete
    * @param {Object} response 200 for success. 400 for failing
    * @returns {Object}
    */
@@ -403,7 +402,7 @@ class GroupController {
    *  authorization: authToken
    * }
    * }
-   * @param {Integer} id group id to leave
+   * @param {Integer} groupId group id to leave
    * @param {Object} response 200 for success. 400 for failing
    * @returns {Object}
    */
