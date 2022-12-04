@@ -5,6 +5,19 @@ const { Office, User, GroupMember, Group } = Models;
 const { Op } = sequelize;
 
 class OfficeController {
+  /**
+   * adding office in database with given name and location
+   *
+   * @param {Object} request {
+   * body: {
+   *  name: String,
+   *  location: String
+   * }
+   * }
+   * @param {Object} response 200 for success.
+   * @returns {Object}
+   */
+
   async addOffice(req, res, next) {
     const officeData = req.body;
 
@@ -18,6 +31,14 @@ class OfficeController {
       next(error);
     }
   }
+
+  /**
+   * getting all offices list from database
+   *
+   *
+   * @param {Object} response 200 for success. 400 for failing
+   * @returns {Object}
+   */
 
   async getOfficesList(req, res, next) {
     try {
@@ -41,6 +62,21 @@ class OfficeController {
       next(error);
     }
   }
+
+  /**
+   * Creates group having group-members eating at office with given Time
+   *
+   * @param {Object} request {
+   * body: {
+   *  time: String
+   * },
+   * headers: {
+   *  authorization: authToken
+   * }
+   * }
+   * @param {Object} response 200 for success.
+   * @returns {Object}
+   */
 
   async eatAtOffice(req, res, next) {
     const authToken = req.headers.authorization;

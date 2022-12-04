@@ -6,6 +6,14 @@ const { User } = Models;
 const RestaurantService = require('./restaurant.service');
 
 class RestaurantController {
+  /**
+   * getting all restaurants list from API
+   *
+   *
+   * @param {Object} response 200 for success. 400 for failing
+   * @returns {Object}
+   */
+
   async getRestaurantListFromAPI(req, res, next) {
     try {
       const restaurants = await RestaurantService.getRestaurantListFromAPI();
@@ -22,6 +30,20 @@ class RestaurantController {
       next(error);
     }
   }
+
+  /**
+   * get Restaurants list from Office
+   *
+   * @param {Object} request {
+   *
+   * headers: {
+   *  authorization: authToken
+   * }
+   * }
+   * @param {Object} response 200 for success. 400 for failing
+   * @returns {Object}
+   */
+
   async getRestaurantListFromOffice(req, res, next) {
     const authToken = req.headers.authorization;
 
