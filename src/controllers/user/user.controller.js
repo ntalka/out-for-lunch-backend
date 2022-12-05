@@ -5,7 +5,7 @@ class UserController {
   /**
    * Update user with given office id
    *
-   * @param {Object} request {
+   * @param {Object} req {
    * body: {
    *  officeId: Integer
    * },
@@ -13,7 +13,7 @@ class UserController {
    *  authorization: authToken
    * }
    * }
-   * @param {Object} response 200 for success. 400 for failing
+   * @param {Object} res 200 for success. 400 for failing
    * @returns {Object}
    */
 

@@ -10,7 +10,7 @@ class RestaurantController {
    * getting all restaurants list from API
    *
    *
-   * @param {Object} response 200 for success. 400 for failing
+   * @param {Object} res 200 for success. 400 for failing
    * @returns {Object}
    */
 
@@ -34,13 +34,13 @@ class RestaurantController {
   /**
    * get Restaurants list from Office
    *
-   * @param {Object} request {
+   * @param {Object} req {
    *
    * headers: {
    *  authorization: authToken
    * }
    * }
-   * @param {Object} response 200 for success. 400 for failing
+   * @param {Object} res 200 for success. 400 for failing
    * @returns {Object}
    */
 

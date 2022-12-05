@@ -8,13 +8,13 @@ class OfficeController {
   /**
    * adding office in database with given name and location
    *
-   * @param {Object} request {
+   * @param {Object} req {
    * body: {
    *  name: String,
    *  location: String
    * }
    * }
-   * @param {Object} response 200 for success.
+   * @param {Object} res 200 for success.
    * @returns {Object}
    */
 
@@ -36,7 +36,7 @@ class OfficeController {
    * getting all offices list from database
    *
    *
-   * @param {Object} response 200 for success. 400 for failing
+   * @param {Object} res 200 for success. 400 for failing
    * @returns {Object}
    */
 
@@ -66,7 +66,7 @@ class OfficeController {
   /**
    * Creates group having group-members eating at office with given Time
    *
-   * @param {Object} request {
+   * @param {Object} req {
    * body: {
    *  time: String
    * },
@@ -74,7 +74,7 @@ class OfficeController {
    *  authorization: authToken
    * }
    * }
-   * @param {Object} response 200 for success.
+   * @param {Object} res 200 for success.
    * @returns {Object}
    */
 

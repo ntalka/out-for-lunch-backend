@@ -59,12 +59,6 @@ const models = {
   Restaurant,
 };
 
-/**
- * ADDING ASSOCIATIONS
- * ============================================
- * All models should define associations in the
- * custom 'associate' function.
- */
 Object.keys(models).forEach((modelName) => {
   if (models[modelName].associate) {
     models[modelName].associate(models);

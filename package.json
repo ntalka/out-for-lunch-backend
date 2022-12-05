@@ -8,7 +8,8 @@
     "migrate": "npx sequelize-cli --options-path ./.sequelize db:migrate",
     "undo-migrate": "npx sequelize-cli --options-path ./.sequelize db:migrate:undo",
     "migration": "npx sequelize-cli migration:generate --options-path=.sequelize --name",
-    "seed": "node ./seeders/index.js"
+    "seed": "node ./seeders/index.js",
+    "docs:build": "documentation build src/** -f html -o docs"
   },
   "engines": {
     "node": "16"
