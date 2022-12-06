@@ -56,7 +56,7 @@ class RestaurantController {
       });
       if (user) {
         let nearByRestaurants = await Sequelize.query(
-          `SELECT id,name FROM restaurants WHERE JSON_CONTAINS(nearby_office, \'[${userResult.officeId}]\')`,
+          `SELECT id,name FROM restaurants WHERE JSON_CONTAINS(nearby_office, \'[${user.officeId}]\')`,
           {
             type: QueryTypes.SELECT,
           }
