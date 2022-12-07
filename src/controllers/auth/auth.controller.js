@@ -5,12 +5,32 @@ var db = require('../../../config/config');
 require('dotenv').config;
 
 const Models = require('../../../models');
-const { User, Office } = Models;
+const {
+  User,
+  Office
+} = Models;
 
 class AuthController {
+
+  /**
+   * Creates a new user with given email and password
+   *
+   * @param {Object} request {
+   * body: {
+   *  email: String,
+   *  password: String
+   * }
+   * }
+   * @param {Object} response 200 for success. 400 for failing
+   * @returns {Object}
+   */
+
   async auth(request, response, next) {
     try {
-      const { email, password } = request.body;
+      const {
+        email,
+        password
+      } = request.body;
 
       await User.findOne({
         where: {
@@ -22,9 +42,8 @@ class AuthController {
           var token = jwt.sign(email, password);
           var hashedPassword = bcrypt.hashSync(password);
           const name = email.split('@')[0];
-          const [firstName, lastName] = name.includes('.')
-            ? name.split('.')
-            : [name, ''];
+          const [firstName, lastName] = name.includes('.') ?
+            name.split('.') : [name, ''];
           User.create({
             email,
             password: hashedPassword,
@@ -55,6 +74,17 @@ class AuthController {
     return undefined;
   }
 
+  /**
+   * Resends authorization token to given email
+   *
+   * @param {Object} request {
+   * body: {
+   *  email: String,
+   * }
+   * }
+   * @param {Object} response 200 for success. 400 for failing
+   * @returns {Object}
+   */
   async resendAuthToken(request, response, next) {
     try {
       const email = request.body.email;
@@ -113,13 +143,11 @@ class AuthController {
         where: {
           email,
         },
-        include: [
-          {
-            model: Office,
-            as: 'office',
-            attributes: ['location'],
-          },
-        ],
+        include: [{
+          model: Office,
+          as: 'office',
+          attributes: ['location'],
+        }, ],
       }).then(async (result) => {
         if (result) {
           if (!result.verified) {
@@ -166,6 +194,18 @@ class AuthController {
     return undefined;
   }
 
+
+  /**
+   * Verifies authorization token to given email
+   *
+   * @param {Object} request {
+   * params: {
+   *  token: String,
+   * }
+   * }
+   * @param {Object} response 200 for success. 400 for failing
+   * @returns {Object}
+   */
   async verify(request, response, next) {
     try {
       var token = request.params.token;
@@ -183,16 +223,13 @@ class AuthController {
         if (result) {
           // console.log(result);
           if (!result.verified) {
-            User.update(
-              {
-                verified: true,
+            User.update({
+              verified: true,
+            }, {
+              where: {
+                authToken: token,
               },
-              {
-                where: {
-                  authToken: token,
-                },
-              }
-            ).then(() => {
+            }).then(() => {
               return response.send({
                 status: 200,
                 authToken: token,
