@@ -1,8 +1,4 @@
-const Models = require('../../../models');
-const moment = require('moment');
-const sequelize = require('sequelize');
-const { Op } = sequelize;
-const { Group, GroupMember, User, Restaurant } = Models;
+const GroupService = require('./group.service');
 
 class GroupController {
   /**
@@ -23,44 +19,21 @@ class GroupController {
 
   async createCustomGroup(request, response, next) {
     const authToken = request.headers.authorization;
+    const { time, restaurantId } = request.body;
     try {
-      let { userId, officeId } = await User.findOne({
-        attributes: ['id', 'officeId'],
-        where: {
-          authToken,
-        },
-      })
-        .then(async (user) => {
-          if (user) {
-            return {
-              userId: user.id,
-              officeId: user.officeId,
-            };
-          } else return null;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-      await Group.create({
-        time: new moment.utc(request.body.time),
-        officeId: officeId,
-        restaurantId: request.body.restaurantId,
-      }).then(async (group) => {
-        if (group) {
-          await GroupMember.create({
-            userId,
-            groupId: group.id,
-          });
-          return response.send({
+      const resp = await GroupService.createCustomGroup({
+        authToken,
+        time,
+        restaurantId,
+      });
+      return resp
+        ? response.send({
             status: 200,
             message: 'Success',
-          });
-        } else {
-          return response.status(400).send({
+          })
+        : response.status(400).send({
             message: 'Group not created',
           });
-        }
-      });
     } catch (error) {
       next(error);
     }
@@ -82,77 +55,16 @@ class GroupController {
   async getGroupsList(request, response, next) {
     const authToken = request.headers.authorization;
     try {
-      await User.findOne({
-        attributes: ['id', 'officeId', 'authToken'],
-        where: {
-          authToken,
-        },
-      })
-        .then(async (user) => {
-          if (user) {
-            await Group.findAll({
-              attributes: ['id', 'officeId', 'restaurantId', 'time'],
-              where: {
-                officeId: user.officeId,
-                time: {
-                  [Op.gte]: new Date(), //gte = greater than equal to
-                },
-              },
-              include: [
-                {
-                  model: GroupMember,
-                  as: 'groupMember',
-                  attributes: ['userId'],
-                  include: [
-                    {
-                      model: User,
-                      as: 'user',
-                      attributes: ['name'],
-                    },
-                  ],
-                },
-                {
-                  model: Restaurant,
-                  as: 'restaurant',
-                  attributes: ['name'],
-                },
-              ],
-              order: [
-                ['time', 'ASC'],
-                [
-                  {
-                    model: Restaurant,
-                    as: 'restaurant',
-                  },
-                  'name',
-                  'ASC',
-                ],
-              ],
-            }).then((result) => {
-              const formattedResult = result.map((group) => {
-                const isUserJoined = group.dataValues.groupMember.filter(
-                  (gm) => gm.userId === user.id
-                );
-                return {
-                  ...group.dataValues,
-                  joined: isUserJoined.length > 0,
-                };
-              });
-              return response.send({
-                status: 200,
-                message: 'Success',
-                data: formattedResult,
-              });
-            });
-          } else {
-            return response.status(400).send({
-              message: 'Could not get user',
-            });
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      const list = await GroupService.getGroupsList({ authToken });
+      return list
+        ? response.send({
+            status: 200,
+            message: 'Success',
+            data: list,
+          })
+        : response.status(400).send({
+            message: 'Could not get user',
+          });
     } catch (error) {
       next(error);
     }
@@ -173,44 +85,17 @@ class GroupController {
 
   async joinGroup(request, response, next) {
     const authToken = request.headers.authorization;
+    const groupId = request.params;
     try {
-      await User.findOne({
-        attributes: ['id'],
-        where: {
-          authToken,
-        },
-      }).then(async (user) => {
-        if (user) {
-          await GroupMember.findOne({
-            attributes: ['groupId'],
-            where: {
-              userId: user.id,
-            },
-          }).then(async (groupMemberResult) => {
-            if (groupMemberResult) {
-              await GroupMember.destroy({
-                where: {
-                  userId: user.id,
-                },
-              });
-            }
-          });
-
-          await GroupMember.create({
-            userId: user.id,
-            groupId: request.params.groupId,
-          });
-
-          return response.send({
+      const group = await GroupService.joinGroup({ authToken, groupId });
+      return group
+        ? response.send({
             status: 200,
             message: 'Group member is added',
-          });
-        } else {
-          return response.status(400).send({
+          })
+        : response.status(400).send({
             message: 'No user found',
           });
-        }
-      });
     } catch (error) {
       next(error);
     }
@@ -235,95 +120,22 @@ class GroupController {
 
   async joinRandomGroup(request, response, next) {
     const authToken = request.headers.authorization;
+    const { startTime, endTime } = request.body;
     try {
-      let { userId, officeId } = await User.findOne({
-        attributes: ['id', 'officeId'],
-        where: {
-          authToken,
-        },
-      })
-        .then(async (user) => {
-          if (user) {
-            return {
-              userId: user.id,
-              officeId: user.officeId,
-            };
-          } else return null;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-
-      const { startTime, endTime } = request.body;
-      const groupIds = await Group.findAll({
-        attributes: ['id'],
-        where: {
-          officeId: officeId,
-          [Op.and]: [
-            {
-              time: {
-                [Op.gte]: new moment(startTime),
-              },
-            },
-            {
-              time: {
-                [Op.lte]: new moment(endTime),
-              },
-            },
-          ],
-        },
-      })
-        .then((result) => {
-          if (result) {
-            return result.map((res) => res.id);
-          } else return [];
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-
-      if (groupIds.length < 1) {
-        return response.status(400).send({
+      const resp = await GroupService.joinRandomGroup({
+        authToken,
+        startTime,
+        endTime,
+      });
+      if (resp && resp.status === 403) {
+        return response.status(403).send({
           message: 'No group to join',
         });
+      } else {
+        return response.status(200).send({
+          message: 'Group joined successfully',
+        });
       }
-
-      await GroupMember.findOne({
-        attributes: ['groupId'],
-        where: {
-          userId: userId,
-        },
-      }).then(async (groupMemberResult) => {
-        let random = Math.floor(Math.random() * groupIds.length);
-        let groupId = groupIds[random];
-        if (groupMemberResult) {
-          const filteredGroups = groupIds.filter(
-            (id) => id !== groupMemberResult.groupId
-          );
-          random = Math.floor(Math.random() * groupIds.length);
-          groupId = filteredGroups[random];
-          await GroupMember.destroy({
-            where: {
-              userId,
-            },
-          });
-        }
-        await GroupMember.create({
-          userId: userId,
-          groupId,
-        })
-          .then(() => {
-            return response.status(200).send({
-              message: 'Group joined successfully',
-            });
-          })
-          .catch((error) => {
-            console.log(error);
-            return response.status(400).send({
-              message: 'Group could not be joined',
-            });
-          });
-      });
     } catch (error) {
       next(error);
     }
@@ -346,11 +158,7 @@ class GroupController {
   async deleteGroup(request, response, next) {
     var groupId = request.params.groupId;
     try {
-      await Group.destroy({
-        where: {
-          id: groupId,
-        },
-      }).then((result) => {
+      await GroupService.deleteGroup({ groupId }).then((result) => {
         if (result) {
           response.send({
             status: 200,
@@ -383,31 +191,18 @@ class GroupController {
 
   async leaveGroup(request, response, next) {
     const authToken = request.headers.authorization;
+    const groupId = request.params.groupId;
     try {
-      await User.findOne({
-        attributes: ['id'],
-        where: {
-          authToken,
-        },
-      }).then(async (user) => {
-        if (user) {
-          await GroupMember.destroy({
-            where: {
-              userId: user.id,
-              groupId: request.params.groupId,
-            },
-          });
+      const resp = await GroupService.leaveGroup({ authToken, groupId });
 
-          return response.send({
+      return resp
+        ? response.send({
             status: 200,
             message: 'Group member is deleted',
-          });
-        } else {
-          return response.status(400).send({
+          })
+        : response.status(400).send({
             message: 'No user found',
           });
-        }
-      });
     } catch (error) {
       next(error);
     }
@@ -433,23 +228,21 @@ class GroupController {
   async updateGroup(request, response, next) {
     var id = request.params.id;
     var restaurantId = request.body.restaurantId;
-    await Group.findOne({
-      where: {
-        id,
-      },
-    }).then(async (group) => {
-      if (group) {
-        group.restaurantId = restaurantId;
-        await group.save();
-        response.status(200).send({
-          message: 'Restaurant changed Successfully',
-        });
-      } else {
-        response.status(400).send({
-          message: 'Failed to change restaurant',
-        });
-      }
-    });
+    try {
+      const resp = await GroupService.updateGroup({
+        groupId: id,
+        restaurantId,
+      });
+      return resp
+        ? response.status(200).send({
+            message: 'Group updated successfully',
+          })
+        : response.status(400).send({
+            message: 'Group cannot be updated',
+          });
+    } catch (error) {
+      next(error);
+    }
   }
 }
 
