@@ -85,7 +85,8 @@ class GroupController {
 
   async joinGroup(request, response, next) {
     const authToken = request.headers.authorization;
-    const groupId = request.params;
+    const { groupId } = request.params;
+
     try {
       const group = await GroupService.joinGroup({ authToken, groupId });
       return group
