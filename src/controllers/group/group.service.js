@@ -63,7 +63,7 @@ class GroupService {
     })
       .then(async (user) => {
         if (user) {
-          await Group.findAll({
+          return await Group.findAll({
             attributes: ['id', 'officeId', 'restaurantId', 'time'],
             where: {
               officeId: user.officeId,
