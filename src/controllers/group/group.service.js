@@ -36,22 +36,26 @@ class GroupService {
       .catch((error) => {
         console.log(error);
       });
-    await Group.create({
+    return await Group.create({
       time: new moment.utc(time),
       officeId,
       restaurantId: restaurantId,
-    }).then(async (group) => {
-      if (group) {
-        await this.createGroupMember({ userId, groupId: group.id });
-        return true;
-      } else {
-        return null;
-      }
-    });
+    })
+      .then(async (group) => {
+        if (group) {
+          await this.createGroupMember({ userId, groupId: group.id });
+          return true;
+        } else {
+          return null;
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }
 
   async getGroupsList({ authToken }) {
-    await User.findOne({
+    return await User.findOne({
       attributes: ['id', 'officeId', 'authToken'],
       where: {
         authToken,
@@ -119,7 +123,7 @@ class GroupService {
   }
 
   async joinGroup({ authToken, groupId }) {
-    await User.findOne({
+    return await User.findOne({
       attributes: ['id'],
       where: {
         authToken,
