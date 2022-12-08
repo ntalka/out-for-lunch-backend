@@ -68,7 +68,7 @@ class GroupService {
             where: {
               officeId: user.officeId,
               time: {
-                [Op.gte]: new Date(),
+                [Op.lte]: new Date(),
               },
             },
             include: [
