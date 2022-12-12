@@ -5,7 +5,7 @@ Out for lunch application – Organizing office lunch breaks and making hard dec
 # Getting Started with the App
 
 1. Copy .env.example file and save it as .env
-2. Add all required variables values in that file
+2. Add all required variable values in that file
 
 ## Available Scripts
 
