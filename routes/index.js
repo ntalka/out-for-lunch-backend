@@ -40,7 +40,7 @@ router.post('/signup', AuthController.auth);
 
 router.post('/login', AuthController.login);
 /**
- * Route serving email verification functionality.
+ * Route serving email verification functionality. token is the auth token.
  * @name post/verify/:token
  */
 router.post(`/verify/:token`, AuthController.verify);
@@ -75,7 +75,7 @@ router.get(
   RestaurantController.getRestaurantListFromOffice
 );
 /**
- * Route for updating group
+ * Route for updating group taking groupId as id in params
  * @name put/update-group/:id
  */
 router.put('/update-group/:id', GroupController.updateGroup);
@@ -88,11 +88,10 @@ router.put('/update-group/:id', GroupController.updateGroup);
 router.post('/create-custom-group', GroupController.createCustomGroup); //custom group
 
 /**
- * Route for joining custom group
+ * Route for joining custom group taking groupId in params
  * @name post/join-group/:groupId
  */
 router.post('/join-group/:groupId', GroupController.joinGroup);
-
 
 /**
  * Route for joining random group
@@ -106,24 +105,22 @@ router.post('/join-random-group', GroupController.joinRandomGroup);
  */
 router.get('/get-groups-list', GroupController.getGroupsList);
 /**
- * Route for deleting groups
+ * Route for deleting groups taking groupId in params
  * @name delete/delete-group/:groupId
  */
 router.delete(`/delete-group/:groupId`, GroupController.deleteGroup);
 
 /**
- * Route for leaving groups
+ * Route for leaving groups taking groupId in params
  * @name post/leave-group/:groupId
  */
 router.post(`/leave-group/:groupId`, GroupController.leaveGroup);
-
 
 /**
  * Route for adding office
  * @name post/add-office
  */
 router.post(`/add-office`, OfficeController.addOffice);
-
 
 /**
  * Route for getting all office
