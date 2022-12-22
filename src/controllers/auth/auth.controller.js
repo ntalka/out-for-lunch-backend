@@ -1,17 +1,13 @@
 var jwt = require('jsonwebtoken');
 const sendEmail = require('./sendEmail');
 const bcrypt = require('bcryptjs');
-var db = require('../../../config/config');
 require('dotenv').config;
+const capitalize = require('capitalize');
 
 const Models = require('../../../models');
-const {
-  User,
-  Office
-} = Models;
+const { User, Office } = Models;
 
 class AuthController {
-
   /**
    * Creates a new user with given email and password
    *
@@ -27,10 +23,7 @@ class AuthController {
 
   async auth(request, response, next) {
     try {
-      const {
-        email,
-        password
-      } = request.body;
+      const { email, password } = request.body;
 
       await User.findOne({
         where: {
@@ -42,13 +35,14 @@ class AuthController {
           var token = jwt.sign(email, password);
           var hashedPassword = bcrypt.hashSync(password);
           const name = email.split('@')[0];
-          const [firstName, lastName] = name.includes('.') ?
-            name.split('.') : [name, ''];
+          const [firstName, lastName] = name.includes('.')
+            ? name.split('.')
+            : [name, ''];
           User.create({
             email,
             password: hashedPassword,
             authToken: token,
-            name: `${firstName} ${lastName}`,
+            name: `${capitalize(firstName)} ${capitalize(lastName)}`,
             officeId: 1,
           });
 
@@ -143,11 +137,13 @@ class AuthController {
         where: {
           email,
         },
-        include: [{
-          model: Office,
-          as: 'office',
-          attributes: ['location'],
-        }, ],
+        include: [
+          {
+            model: Office,
+            as: 'office',
+            attributes: ['location'],
+          },
+        ],
       }).then(async (result) => {
         if (result) {
           if (!result.verified) {
@@ -194,7 +190,6 @@ class AuthController {
     return undefined;
   }
 
-
   /**
    * Verifies authorization token to given email
    *
@@ -223,13 +218,16 @@ class AuthController {
         if (result) {
           // console.log(result);
           if (!result.verified) {
-            User.update({
-              verified: true,
-            }, {
-              where: {
-                authToken: token,
+            User.update(
+              {
+                verified: true,
               },
-            }).then(() => {
+              {
+                where: {
+                  authToken: token,
+                },
+              }
+            ).then(() => {
               return response.send({
                 status: 200,
                 authToken: token,
