@@ -10,8 +10,9 @@ const DefaultOfficesSeeder = async () => {
         [Op.eq]: null,
       },
     },
+    raw: true,
   });
-  if (isAlreadyExists > 0) {
+  if (isAlreadyExists.length > 0) {
     return '';
   }
   let offices = [
